@@ -1,5 +1,6 @@
 ﻿using Emgu.CV;
 using Emgu.CV.BgSegm;
+using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using System;
 using System.Collections.Generic;
@@ -35,6 +36,7 @@ namespace GaitRecognition
             pictureViewBox.SizeMode = PictureBoxSizeMode.Zoom;
             //removebackground();
             batchProcessor();
+            //Skelatanize();
         }
 
         
@@ -132,9 +134,39 @@ namespace GaitRecognition
             if (filepath != null) {
                 CvInvoke.Imwrite(outputFolder + filepath, output);
             }
+            Skelatanize(output, filepath);
             output.Dispose();
         }
+        // Skelton Extraction
+        public void Skelatanize(Image<Gray,byte> imgOld, String fileName = null)
+        {
+            if (fileName == null) {
+                return;
+            }
+            //img = new Image<Gray, byte>(outputFolder + "Frame_27.bmp");
+            //Image<Gray, byte> imgOld = new Image<Gray, byte>(outputFolder + fileName);
+            Image<Gray, byte> img2 = imgOld.Clone();//(new Image<Gray, byte>(imgOld.Width, imgOld.Height, new Gray(255))).Sub(imgOld);
+            Image<Gray, byte> eroded = new Image<Gray, byte>(img2.Size);
+            Image<Gray, byte> temp = new Image<Gray, byte>(img2.Size);
+            Image<Gray, byte> skel = new Image<Gray, byte>(img2.Size);
+            skel.SetValue(0);
+            CvInvoke.Threshold(img2, img2, 127, 256, 0);
+            var element = CvInvoke.GetStructuringElement(ElementShape.Cross, new Size(3, 3), new Point(-1, -1));
+            bool done = false;
 
+            while (!done)
+            {
+                CvInvoke.Erode(img2, eroded, element, new Point(-1, -1), 1, BorderType.Reflect, default(MCvScalar));
+                CvInvoke.Dilate(eroded, temp, element, new Point(-1, -1), 1, BorderType.Reflect, default(MCvScalar));
+                CvInvoke.Subtract(img2, temp, temp);
+                CvInvoke.BitwiseOr(skel, temp, skel);
+                eroded.CopyTo(img2);
+                if (CvInvoke.CountNonZero(img2) == 0) done = true;
+            }
+            CvInvoke.Imwrite(outputFolder + "Sk_" + fileName, skel);
+            pictureViewBox.Image = skel;
+            //return skel.Bitmap;
+        }
         // Open the Video File
         private void openVideoToolStripMenuItem_Click(object sender, EventArgs e)
         {
