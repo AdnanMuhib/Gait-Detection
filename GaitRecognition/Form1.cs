@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Emgu.CV.XImgproc;
 using System.Windows.Forms;
 
 namespace GaitRecognition
@@ -34,8 +35,11 @@ namespace GaitRecognition
             this.KeyPreview = true;
             frameIndex = 0;
             pictureViewBox.SizeMode = PictureBoxSizeMode.Zoom;
+            //img = new Image<Gray, byte>(outputFolder + "bg_18.bmp");
+            //Image<Gray, byte> binary = img.ThresholdBinary(new Gray(50), new Gray(255));
+            
             //removebackground();
-            batchProcessor();
+           // batchProcessor();
             //Skelatanize();
         }
 
@@ -103,39 +107,80 @@ namespace GaitRecognition
 
             foreach (String imgName in files) {
                 img = new Image<Gray, byte>(inputFolderPath +  imgName);
-                removebackground("bg_" + imgName);
+                removebackground("_out_" + imgName);
             }
+            this.Close();
             return;
         }
 
         // Background Subtraction From the Given Background and Input Image
         public void removebackground(string filepath = null) {
-            //bgImage = new Image<Gray, byte>(outputFolder + "Frame_102.bmp");
-            //img = new Image<Gray, byte>(outputFolder + "Frame_27.bmp");
-            //Image<Bgr, byte> bgImage1 = new Image<Bgr, byte>(outputFolder + "Frame_102.bmp");
-            //Image<Bgr, byte>  img1 = new Image<Bgr, byte>(outputFolder + "Frame_27.bmp");
-            try
-            {
-               // bgImage = bgImage.SmoothBlur(2, 2, true);
-                //img = img.SmoothBlur(2, 2, true);
-            }
-            catch (Exception ex) {
-                MessageBox.Show(ex.Message);
-            }
-            
 
+            filepath = null; // to avoid saving files in the output folder
             Image<Gray, byte> output = new Image<Gray, byte>(bgImage.Width, bgImage.Height);
-
-            BackgroundSubtractorMOG2 bgsubtractor = new BackgroundSubtractorMOG2(varThreshold:80,shadowDetection:false);
+            BackgroundSubtractorMOG2 bgsubtractor = new BackgroundSubtractorMOG2(varThreshold:100,shadowDetection:false);
             bgsubtractor.Apply(bgImage, output);
             bgsubtractor.Apply(img, output);
             pictureViewBox.Image = output;
+            output.Canny(100,100);
             img.Dispose();
-            if (filepath != null) {
-                CvInvoke.Imwrite(outputFolder + filepath, output);
+
+            CvInvoke.Erode(output, output, null, new Point(-1, -1), 1, BorderType.Reflect, default(MCvScalar));
+            CvInvoke.Dilate(output, output, null, new Point(-1, -1), 1, BorderType.Reflect, default(MCvScalar));
+
+            // Write the Silhoutte output to the file
+            if (filepath != null)
+            {
+                CvInvoke.Imwrite(outputFolder + "bg_subtract_" + filepath, output);
             }
-            Skelatanize(output, filepath);
+
+            // Using Thinning Algorithm on Silhoutte
+            Image<Gray, byte> thinOutput = new Image<Gray, byte>(output.Width, output.Height);
+            XImgprocInvoke.Thinning(output, thinOutput, ThinningTypes.ZhangSuen);
+            pictureViewBox.Image = thinOutput.Not().Not();
+            
+            //Skelatanize(output, filepath);
+
+
+            // Write the thinned Image to the file
+            if (filepath != null)
+            {
+                CvInvoke.Imwrite(outputFolder + "thinned_" + filepath, thinOutput.Not().Not());
+            }
+
+            Image<Bgr, byte> linesImg = new Image<Bgr, byte>(thinOutput.Width, thinOutput.Height);
+
+            // Using Hough Transform for Line Feature Extraction
+
+            
+            
+
+            double cannyThreshold = 180.0;
+            double cannyThresholdLinking = 120.0;
+            UMat cannyEdges = new UMat();
+            CvInvoke.Canny(thinOutput, cannyEdges, cannyThreshold, cannyThresholdLinking);
+            LineSegment2D[] lines = CvInvoke.HoughLinesP(
+              cannyEdges,
+              3,  // Distance resolution in pixel-related units
+              Math.PI / 45.0,  // Angle resolution measured in radians.
+              10, // threshold
+              30, // min Line width
+              20); // gap between lines
+
+            foreach (LineSegment2D line in lines)
+            {
+                linesImg.Draw(line, new Bgr(Color.Green), 1);
+            }
+            // Write the Lined Image to the file
+            if (filepath != null)
+            {
+                CvInvoke.Imwrite(outputFolder + "lines_" + filepath, linesImg);
+            }
+           //pictureViewBox.Image = linesImg;
+            img.Dispose();
+            linesImg.Dispose();
             output.Dispose();
+            thinOutput.Dispose();
         }
         // Skelton Extraction
         public void Skelatanize(Image<Gray,byte> imgOld, String fileName = null)
@@ -164,7 +209,7 @@ namespace GaitRecognition
                 if (CvInvoke.CountNonZero(img2) == 0) done = true;
             }
             CvInvoke.Imwrite(outputFolder + "Sk_" + fileName, skel);
-            pictureViewBox.Image = skel;
+            //pictureViewBox.Image = skel;
             //return skel.Bitmap;
         }
         // Open the Video File
@@ -209,8 +254,8 @@ namespace GaitRecognition
                         try
                         {
                             img = _capture.QueryFrame().ToImage<Gray, byte>();
-                            CvInvoke.Imwrite(outputFolder + "Frame_" + frameIndex + ".bmp", img);
-                            removebackground();
+                            //CvInvoke.Imwrite(outputFolder + "Frame_" + frameIndex + ".bmp", img);
+                            removebackground("Frame_" + frameIndex + ".bmp");
                         }
                         catch (Exception ex)
                         {
