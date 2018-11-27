@@ -42,6 +42,8 @@ namespace GaitRecognition
         
         HoughLineTransformation lineTransform;
 
+        bool saveResults = true;
+
         public Form1()
         {
             InitializeComponent();
@@ -52,11 +54,11 @@ namespace GaitRecognition
             lineTransform.MinLineIntensity = 10;
             
             
-            bgImage = new Image<Gray, byte>(inputFolder + "b.bmp");
-            img = new Image<Gray, byte>(inputFolder + "11.bmp");
-            BgrImg = new Image<Bgr, byte>(inputFolder + "11.bmp");
+            bgImage = new Image<Gray, byte>(inputFolder + "b.bmp").Resize(400,400,Inter.Cubic);
+            img = new Image<Gray, byte>(inputFolder + "12.bmp").Resize(400, 400, Inter.Cubic);
+            BgrImg = new Image<Bgr, byte>(inputFolder + "12.bmp").Resize(400, 400, Inter.Cubic);
 
-            removebackground();
+            removebackground("12.bmp");
             // batchProcessor();
         }
 
@@ -117,7 +119,7 @@ namespace GaitRecognition
             foreach (FileInfo file in Files) {
                 if (file.Name.Equals("b.bmp"))
                 {
-                    bgImage = new Image<Gray, byte>(inputFolder + file.Name);
+                    bgImage = new Image<Gray, byte>(inputFolder + file.Name).Resize(400,400,Inter.Cubic);
                 }
                 else {
                     files.Add(file.Name);
@@ -125,8 +127,8 @@ namespace GaitRecognition
             }
 
             foreach (String imgName in files) {
-                img = new Image<Gray, byte>(inputFolder +  imgName);
-                BgrImg = new Image<Bgr, byte>(inputFolder + imgName);
+                img = new Image<Gray, byte>(inputFolder +  imgName).Resize(400, 400, Inter.Cubic);
+                BgrImg = new Image<Bgr, byte>(inputFolder + imgName).Resize(400, 400, Inter.Cubic);
                 removebackground("_out_" + imgName);
             }
             this.Close();
@@ -135,8 +137,6 @@ namespace GaitRecognition
 
         // Background Subtraction From the Given Background and Input Image
         public void removebackground(string filepath = null) {
-
-            //filepath = null; // to avoid saving files in the output folder
             Image<Gray, byte> output = new Image<Gray, byte>(bgImage.Width, bgImage.Height);
             BackgroundSubtractorMOG2 bgsubtractor = new BackgroundSubtractorMOG2(varThreshold:100,shadowDetection:false);
             bgsubtractor.Apply(bgImage, output);
@@ -148,7 +148,7 @@ namespace GaitRecognition
             CvInvoke.Dilate(output, output, null, new System.Drawing.Point(-1, -1), 1, BorderType.Reflect, default(MCvScalar));
 
             // Write the Silhoutte output to the file
-            if (filepath != null)
+            if (filepath != null && saveResults == true)
             {
                 CvInvoke.Imwrite(outputFolder + "bg_subtract_" + filepath, output);
             }
@@ -159,7 +159,7 @@ namespace GaitRecognition
             pictureViewBox.Image = thinOutput.Not().Not();
 
             // Write the thinned Image to the file
-            if (filepath != null)
+            if (filepath != null && saveResults == true)
             {
                 CvInvoke.Imwrite(outputFolder + "thinned_" + filepath, thinOutput.Not().Not());
                 
@@ -188,21 +188,98 @@ namespace GaitRecognition
                         5, //min Line width
                         8); //gap between lines
 
+            // drawing all hough lines on lineImg
             Mat lineImage = new Mat(ThinImage.Size, DepthType.Cv8U, 3);
             lineImage.SetTo(new MCvScalar(0));
             foreach (LineSegment2D line in lines)
             {
-                CvInvoke.Line(lineImage, line.P1, line.P2, new Bgr(Color.Green).MCvScalar, 2);
+                if ((line.P2.X - line.P1.X) != 0)
+                { // to avoid divide by zero
+                    double slope = (line.P2.Y - line.P1.Y) / (line.P2.X - line.P1.X);
+                    CvInvoke.Line(lineImage, line.P1, line.P2, new Bgr(Color.Green).MCvScalar, 1);
+                    //Console.WriteLine("Height {0}, Slope {1}, Direction {2}", line.Length, slope, line.Direction);
+                }
             }
-
-            if (filePath != null)
+            
+            // writig the Hough Line Image to Output Folder
+            if (filePath != null && saveResults == true)
             {
                 CvInvoke.Imwrite(outputFolder + "HoughLine_" + filePath, lineImage);
             }
+            
+            // Post Processing  the Hough Lines
+            
+            // Convert the Hough Lines to a List of Line (Custom)Class
+            List<Line> lstLines = Line.ConvertToList(lines);
+            
+            //********************************************************************************
+            //* Approach 1 By Calculating Distance Between Lines
+            //********************************************************************************
 
-            pictureViewBox.Image = lineImage;
+
+            // merge lines by eliminating the p1 distance
+            List<Line> lstMergedByDistance = Line.MergeLinesByDistance(lstLines, 20);
+            
+            // merge lines by eliminating the p2 distance
+            lstMergedByDistance = Line.MergeLinesByDistance(lstMergedByDistance, 20, p1:false);
+
+            // drawing the lines on Image
+            Mat distImg = new Mat(ThinImage.Size, DepthType.Cv8U, 3);
+            distImg.SetTo(new MCvScalar(0));
+
+            foreach (Line l in lstMergedByDistance)
+            {
+                if (l.length < 10) // ignore lines with shorter length
+                {
+                    continue;
+                }
+                CvInvoke.Line(distImg, l.p1, l.p2, new Bgr(Color.Green).MCvScalar, 1);
+            }
+
+            if (filePath != null && saveResults == true)
+            {
+                CvInvoke.Imwrite(outputFolder + "Distance_ Merged" + filePath + ".bmp", distImg);
+            }
+
+            //********************************************************************************
+
+            //********************************************************************************
+            //* Approach 2 By Grouping the Lines With Same Slope
+            //********************************************************************************
+
+            // Grouping the lines on the basis of their Slope
+            /*
+            var groupedSlopList = lstLines
+                .GroupBy(u => u.slope)
+                .Select(grp => grp.ToList())
+                .ToList();
+
+            List<Line> mergedLines = new List<Line>();
+            // mergin lines into one with same slope
+            foreach (List<Line> lst in groupedSlopList)
+            {
+                Line line = Line.MergeLinesBySlope(lst);
+                mergedLines.Add(line);
+            }
+
+            Mat slopImg = new Mat(ThinImage.Size, DepthType.Cv8U, 3);
+            distImg.SetTo(new MCvScalar(0));
+            
+            // Drawing the Merged Lines on slopimg
+            
+            foreach (Line l in mergedLines) {
+                    CvInvoke.Line(slopImg, l.p1, l.p2, new Bgr(Color.Green).MCvScalar, 1);
+                    CvInvoke.PutText(slopImg, "" + l.slope.ToString(), l.p1, FontFace.HersheyPlain, 1, new Bgr(Color.White).MCvScalar, 1);
+             }
+            if (filePath != null && saveResults == true)
+            {
+                CvInvoke.Imwrite(outputFolder + "Slop_" + filePath + ".bmp", slopImg);
+                slopImg.Dispose();
+            }*/
+
+            //********************************************************************************
         }
-        
+
         // Open the Video File
         private void openVideoToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -249,7 +326,6 @@ namespace GaitRecognition
                             BgrImg = _capture.QueryFrame().ToImage<Bgr, byte>();
                             //CvInvoke.Imwrite(outputFolder + "Frame_" + frameIndex + ".bmp", img);
                             removebackground("Frame_" + frameIndex + ".bmp");
-                            //detectPerson();
                         }
                         catch (Exception ex)
                         {
