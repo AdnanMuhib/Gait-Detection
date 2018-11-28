@@ -24,7 +24,7 @@ using Emgu.CV.Util;
 
 namespace GaitRecognition
 {
-    public partial class Form1 : Form
+    public partial class GaitRecognition : Form
     {
         // input and output directories for batch Processing
         String inputFolder = @"D:\UNIVERSITY DOCUMENTS\FYP\Human Activity Recognition\KTH Dataset\Gait Pics\Nasir\Nasir3\";
@@ -44,7 +44,7 @@ namespace GaitRecognition
 
         bool saveResults = true;
 
-        public Form1()
+        public GaitRecognition()
         {
             InitializeComponent();
             this.KeyPreview = true;
@@ -229,7 +229,7 @@ namespace GaitRecognition
 
             foreach (Line l in lstMergedByDistance)
             {
-                if (l.length < 10) // ignore lines with shorter length
+                if (l.length < 20) // ignore lines with shorter length
                 {
                     continue;
                 }
@@ -240,7 +240,7 @@ namespace GaitRecognition
             {
                 CvInvoke.Imwrite(outputFolder + "Distance_ Merged" + filePath + ".bmp", distImg);
             }
-
+            pictureViewBox.Image = distImg;
             //********************************************************************************
 
             //********************************************************************************
