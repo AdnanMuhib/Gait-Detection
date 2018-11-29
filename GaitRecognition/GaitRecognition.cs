@@ -13,12 +13,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Emgu.CV.XImgproc;
 using System.Windows.Forms;
-using Accord;
-using AForge;
-using Accord.MachineLearning;
-using Accord.Statistics.Filters;
-using Accord.Imaging.Filters;
-using Accord.Imaging;
 using System.Drawing.Imaging;
 using Emgu.CV.Util;
 
@@ -40,7 +34,6 @@ namespace GaitRecognition
 
         VideoCapture _capture; // to read video files
         
-        HoughLineTransformation lineTransform;
 
         bool saveResults = true;
 
@@ -50,9 +43,6 @@ namespace GaitRecognition
             this.KeyPreview = true;
             frameIndex = 0;
             //pictureViewBox.SizeMode = PictureBoxSizeMode.Zoom;
-            lineTransform = new HoughLineTransformation();
-            lineTransform.MinLineIntensity = 10;
-            
             
             bgImage = new Image<Gray, byte>(inputFolder + "b.bmp").Resize(400,400,Inter.Cubic);
             img = new Image<Gray, byte>(inputFolder + "12.bmp").Resize(400, 400, Inter.Cubic);
@@ -164,14 +154,23 @@ namespace GaitRecognition
                 CvInvoke.Imwrite(outputFolder + "thinned_" + filepath, thinOutput.Not().Not());
                 
             }
-
+            PersonFrame person = new PersonFrame();
+            person.FindPoints(output);
+            person.calculate_width();
+            person.calculate_height();
+            Point srcPt = new Point(person.top_left.X, person.top_right.Y);
+            Rectangle rec = new Rectangle(srcPt, new Size((int)person.width, (int)person.height));
+            CvInvoke.Rectangle(thinOutput, rec, new Rgb(Color.White).MCvScalar, 2);
+            CvInvoke.Imshow("Person Fame", thinOutput.Not());
             // Applying Hough Line Transformation
-            Hough(thinOutput, filepath);
+            //Hough(thinOutput, filepath);
             img.Dispose();
             output.Dispose();
             thinOutput.Dispose();
         }
         
+        // Get Conture of Person From the Picture
+
         // Applying Hough Transformation to get Straight lines
         public void Hough(Image<Gray, byte> ThinImage, String filePath = null) {
 

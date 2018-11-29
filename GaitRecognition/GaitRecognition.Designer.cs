@@ -1,6 +1,6 @@
 ﻿namespace GaitRecognition
 {
-    partial class Form1
+    partial class GaitRecognition
     {
         /// <summary>
         /// Required designer variable.
