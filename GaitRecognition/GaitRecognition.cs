@@ -24,6 +24,7 @@ namespace GaitRecognition
         String inputFolder = @"D:\UNIVERSITY DOCUMENTS\FYP\Human Activity Recognition\KTH Dataset\Gait Pics\Nasir\Nasir3\";
         String outputFolder = @"D:\UNIVERSITY DOCUMENTS\FYP\Human Activity Recognition\Test Outputs\";
 
+        
         Image<Bgr, byte> BgrImg; // Color Image
 
         Image<Gray, byte> img; // any input image
@@ -33,7 +34,9 @@ namespace GaitRecognition
         int frameIndex;
 
         VideoCapture _capture; // to read video files
-        
+
+        // frame of the person 
+        PersonFrame frm;
 
         bool saveResults = true;
 
@@ -143,6 +146,10 @@ namespace GaitRecognition
                 CvInvoke.Imwrite(outputFolder + "bg_subtract_" + filepath, output);
             }
 
+            // finding the Bounding Box of the Person
+            frm = new PersonFrame();
+            Rectangle rec = frm.findBoundry(output);
+            
             // Using Thinning Algorithm on Silhoutte
             Image<Gray, byte> thinOutput = new Image<Gray, byte>(output.Width, output.Height);
             XImgprocInvoke.Thinning(output, thinOutput, ThinningTypes.ZhangSuen);
@@ -154,16 +161,19 @@ namespace GaitRecognition
                 CvInvoke.Imwrite(outputFolder + "thinned_" + filepath, thinOutput.Not().Not());
                 
             }
-            PersonFrame person = new PersonFrame();
-            person.FindPoints(output);
-            person.calculate_width();
-            person.calculate_height();
-            Point srcPt = new Point(person.top_left.X, person.top_right.Y);
-            Rectangle rec = new Rectangle(srcPt, new Size((int)person.width, (int)person.height));
+            
+            // drawing bounding Box of the person
             CvInvoke.Rectangle(thinOutput, rec, new Rgb(Color.White).MCvScalar, 2);
-            CvInvoke.Imshow("Person Fame", thinOutput.Not());
+
+            // drawing the middle line of the Person
+            CvInvoke.Line(thinOutput, frm.middle_line.p1, frm.middle_line.p2, new Rgb(Color.White).MCvScalar, 2);
+
+            // Display the Image
+            CvInvoke.Imshow("Person Fame", thinOutput);
+            
             // Applying Hough Line Transformation
-            //Hough(thinOutput, filepath);
+            Hough(thinOutput, filepath);
+
             img.Dispose();
             output.Dispose();
             thinOutput.Dispose();
@@ -199,7 +209,17 @@ namespace GaitRecognition
                     //Console.WriteLine("Height {0}, Slope {1}, Direction {2}", line.Length, slope, line.Direction);
                 }
             }
-            
+
+            // drawing bounding Box of the person
+            CvInvoke.Rectangle(lineImage, frm.rec, new Rgb(Color.White).MCvScalar, 2);
+
+            // drawing the middle line of the Person
+            CvInvoke.Line(lineImage, frm.middle_line.p1, frm.middle_line.p2, new Rgb(Color.White).MCvScalar, 2);
+
+            // Display the Image
+            CvInvoke.Imshow("Lines Framed", lineImage);
+
+
             // writig the Hough Line Image to Output Folder
             if (filePath != null && saveResults == true)
             {
@@ -210,13 +230,14 @@ namespace GaitRecognition
             
             // Convert the Hough Lines to a List of Line (Custom)Class
             List<Line> lstLines = Line.ConvertToList(lines);
-            
+
             //********************************************************************************
             //* Approach 1 By Calculating Distance Between Lines
             //********************************************************************************
 
 
             // merge lines by eliminating the p1 distance
+            /*
             List<Line> lstMergedByDistance = Line.MergeLinesByDistance(lstLines, 20);
             
             // merge lines by eliminating the p2 distance
@@ -239,7 +260,7 @@ namespace GaitRecognition
             {
                 CvInvoke.Imwrite(outputFolder + "Distance_ Merged" + filePath + ".bmp", distImg);
             }
-            pictureViewBox.Image = distImg;
+            pictureViewBox.Image = distImg;*/
             //********************************************************************************
 
             //********************************************************************************

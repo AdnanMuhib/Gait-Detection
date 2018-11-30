@@ -1,5 +1,8 @@
 ﻿using Emgu.CV;
+using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
+using Emgu.CV.Util;
+using Emgu.CV.XImgproc;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -17,16 +20,42 @@ namespace GaitRecognition
         public Point bottom_right;
         public double width;
         public double height;
-
+        public Line middle_line;
+        public Rectangle rec;
         public PersonFrame() {
             top_left = new Point(0,0);
             top_right = new Point(0,0);
             bottom_left = new Point(0,0);
             bottom_right = new Point(0,0);
+            middle_line = new Line();
             width = 0;
             height = 0;
         }
 
+        public PersonFrame(Rectangle rec) {
+            top_left = new Point(0, 0);
+            top_right = new Point(0, 0);
+            bottom_left = new Point(0, 0);
+            bottom_right = new Point(0, 0);
+            middle_line = new Line();
+
+            top_left.X = rec.X;
+            top_left.Y = rec.Y;
+            top_right.X = rec.X + rec.Width;
+            top_right.Y = rec.Y;
+            bottom_left.X = rec.X;
+            bottom_left.Y = rec.Y + rec.Height;
+            bottom_right.X = rec.X + rec.Width;
+            bottom_right.Y = rec.Y + rec.Height;
+            calculate_width();
+            calculate_height();
+            middle_line.p1.X = rec.X;
+            middle_line.p1.Y = rec.Y + rec.Height / 2;
+            middle_line.p2.X = rec.X + rec.Width;
+            middle_line.p2.Y = rec.Y + rec.Height / 2;
+            middle_line.length = rec.Width;
+        }
+        
         public void calculate_width()
         {
             if (top_left.X != 0 && top_right.X != 0) {
@@ -110,6 +139,50 @@ namespace GaitRecognition
                     }
                 }
             }
+        }
+
+        // find the frame using largest Conture
+        public  Rectangle findBoundry(Image<Gray, byte> output)
+        {
+            Image<Bgr, byte> colorImage = output.Convert<Bgr, byte>();
+            Image<Gray, byte> thinning = new Image<Gray, byte>(output.Width, output.Height);
+            double largest_area = 0.0;
+            int largest_contour_index = 0;
+            rec = new Rectangle();
+            VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint();
+            CvInvoke.FindContours(output, contours, null, RetrType.List, ChainApproxMethod.ChainApproxSimple);
+            for (int i = 0; i < contours.Size; i++) // iterate through each contour. 
+            {
+                double a = CvInvoke.ContourArea(contours[i], false);
+                if (a > largest_area)
+                {
+                    largest_area = a;
+                    largest_contour_index = i;                //Store the index of largest contour
+                    rec = CvInvoke.BoundingRectangle(contours[i]); // Find the bounding rectangle for biggest contour
+                }
+            }
+
+            top_left.X = rec.X;
+            top_left.Y = rec.Y;
+            top_right.X = rec.X + rec.Width;
+            top_right.Y = rec.Y;
+            bottom_left.X = rec.X;
+            bottom_left.Y = rec.Y + rec.Height;
+            bottom_right.X = rec.X + rec.Width;
+            bottom_right.Y = rec.Y + rec.Height;
+            calculate_width();
+            calculate_height();
+            middle_line.p1.X = rec.X;
+            middle_line.p1.Y = rec.Y + rec.Height / 2;
+            middle_line.p2.X = rec.X + rec.Width;
+            middle_line.p2.Y = rec.Y + rec.Height / 2;
+            middle_line.length = rec.Width;
+            return rec;
+
+            //XImgprocInvoke.Thinning(output, thinning, ThinningTypes.ZhangSuen);
+            //thinning = thinning.Not().Not();
+            //thin.Image = thinning;
+            //hough(thinning, bounding_rect);
         }
     }
 }
