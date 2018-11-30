@@ -33,6 +33,7 @@ namespace GaitRecognition
         }
 
         public PersonFrame(Rectangle rec) {
+            this.rec = rec;
             top_left = new Point(0, 0);
             top_right = new Point(0, 0);
             bottom_left = new Point(0, 0);
@@ -184,5 +185,6 @@ namespace GaitRecognition
             //thin.Image = thinning;
             //hough(thinning, bounding_rect);
         }
+        
     }
 }
