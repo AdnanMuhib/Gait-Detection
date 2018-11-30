@@ -163,13 +163,13 @@ namespace GaitRecognition
             }
             
             // drawing bounding Box of the person
-            CvInvoke.Rectangle(thinOutput, rec, new Rgb(Color.White).MCvScalar, 2);
+            //CvInvoke.Rectangle(thinOutput, rec, new Rgb(Color.White).MCvScalar, 2);
 
             // drawing the middle line of the Person
-            CvInvoke.Line(thinOutput, frm.middle_line.p1, frm.middle_line.p2, new Rgb(Color.White).MCvScalar, 2);
+            //CvInvoke.Line(thinOutput, frm.middle_line.p1, frm.middle_line.p2, new Rgb(Color.White).MCvScalar, 2);
 
             // Display the Image
-            CvInvoke.Imshow("Person Fame", thinOutput);
+            //CvInvoke.Imshow("Person Fame", thinOutput);
             
             // Applying Hough Line Transformation
             Hough(thinOutput, filepath);
@@ -195,29 +195,130 @@ namespace GaitRecognition
                         Math.PI / 120.0, //Angle resolution measured in radians.
                         10, //threshold
                         5, //min Line width
-                        8); //gap between lines
+                        20); //gap between lines
 
             // drawing all hough lines on lineImg
             Mat lineImage = new Mat(ThinImage.Size, DepthType.Cv8U, 3);
             lineImage.SetTo(new MCvScalar(0));
+
             foreach (LineSegment2D line in lines)
             {
+                //CvInvoke.Line(lineImage, line.P1, line.P2, new Bgr(Color.Green).MCvScalar, 1);
                 if ((line.P2.X - line.P1.X) != 0)
                 { // to avoid divide by zero
-                    double slope = (line.P2.Y - line.P1.Y) / (line.P2.X - line.P1.X);
+                    //double slope = (line.P2.Y - line.P1.Y) / (line.P2.X - line.P1.X);
                     CvInvoke.Line(lineImage, line.P1, line.P2, new Bgr(Color.Green).MCvScalar, 1);
-                    //Console.WriteLine("Height {0}, Slope {1}, Direction {2}", line.Length, slope, line.Direction);
                 }
             }
 
+            // get a list of lines using Line class
+
+            List<Line> lstLine = Line.ConvertToList(lines);
+
+            // list of Lines in upper and Lower half
+            List<Line> topLines = new List<Line>();
+            List<Line> bottomLines = new List<Line>();
+            List<Line> commonLines = new List<Line>();
+            // seperating the lines in their upper and lower half
+
+            foreach (Line line in lstLine) {
+                if (line.p1.Y < frm.middle_line.p1.Y && line.p2.Y < frm.middle_line.p1.Y)
+                {
+                    topLines.Add(line);
+                }
+                else if (line.p1.Y > frm.middle_line.p1.Y && line.p2.Y > frm.middle_line.p1.Y)
+                {
+                    bottomLines.Add(line);
+                }
+                else {
+                    commonLines.Add(line);
+                }
+            }
+            // drawing lines with different colors
+            Mat OneLineImage = new Mat(ThinImage.Size, DepthType.Cv8U, 3);
+            OneLineImage.SetTo(new MCvScalar(0));
+
+            // drawing top lines with red color
+            foreach (Line line in topLines) {
+                CvInvoke.Line(OneLineImage, line.p1, line.p2, new Rgb(Color.Red).MCvScalar, 1);
+            }
+
+            // drawing bottom lines with blue color
+            foreach (Line line in bottomLines)
+            {
+                CvInvoke.Line(OneLineImage, line.p1, line.p2, new Rgb(Color.Blue).MCvScalar, 1);
+            }
+
+            // drawing Common Lines with yellow Color
+            foreach (Line line in commonLines)
+            {
+                CvInvoke.Line(OneLineImage, line.p1, line.p2, new Rgb(Color.Yellow).MCvScalar, 1);
+            }
+
+            CvInvoke.PutText(OneLineImage, "Middle Line", new Point(10, 30), FontFace.HersheyPlain, 1, new Rgb(Color.White).MCvScalar, 1);
+            CvInvoke.PutText(OneLineImage, "TOP Lines", new Point(10, 50), FontFace.HersheyPlain, 1, new Rgb(Color.Red).MCvScalar, 1);
+            CvInvoke.PutText(OneLineImage, "Bottom Lines", new Point(10, 70), FontFace.HersheyPlain, 1, new Rgb(Color.Blue).MCvScalar, 1);
+            CvInvoke.PutText(OneLineImage, "Common Lines", new Point(10, 90), FontFace.HersheyPlain, 1, new Rgb(Color.Yellow).MCvScalar, 1);
+            
+            // drawing the middle line of the Person
+            CvInvoke.Line(OneLineImage, frm.middle_line.p1, frm.middle_line.p2, new Rgb(Color.White).MCvScalar, 1);
+            CvInvoke.Imwrite(outputFolder + "Seperated Line" + filePath, OneLineImage);
+
+            // displaying the image
+            CvInvoke.Imshow("Seperated Lines", OneLineImage);
+
+            // getting the top left right lines 
+            List<Line> topLeftLines = Line.GetLeftRightLines(topLines)[0];
+            List<Line> topRightLines = Line.GetLeftRightLines(topLines)[1];
+
+            // getting the bottom left right lines 
+            List<Line> bottomLeftLines = Line.GetLeftRightLines(bottomLines)[0];
+            List<Line> bottomRightLines = Line.GetLeftRightLines(bottomLines)[1];
+
+            // drawing lines with different colors
+            Mat leftRightLineImage = new Mat(ThinImage.Size, DepthType.Cv8U, 3);
+            leftRightLineImage.SetTo(new MCvScalar(0));
+
+            // drawing top left lines 
+            foreach (Line line in topLeftLines) {
+                CvInvoke.Line(leftRightLineImage, line.p1, line.p2, new Rgb(Color.Blue).MCvScalar, 1);
+            }
+
+            // drawing top right lines 
+            foreach (Line line in topRightLines)
+            {
+                CvInvoke.Line(leftRightLineImage, line.p1, line.p2, new Rgb(Color.Red).MCvScalar, 1);
+            }
+            // drawing bottom left lines 
+            foreach (Line line in bottomLeftLines)
+            {
+                CvInvoke.Line(leftRightLineImage, line.p1, line.p2, new Rgb(Color.Blue).MCvScalar, 1);
+            }
+
+            // drawing bottom right lines 
+            foreach (Line line in bottomRightLines)
+            {
+                CvInvoke.Line(leftRightLineImage, line.p1, line.p2, new Rgb(Color.Red).MCvScalar, 1);
+            }
+            // Get the Big Line from Common Lines
+            Line bigCommonLine = Line.getBigLine(commonLines);
+            CvInvoke.Line(leftRightLineImage, bigCommonLine.p1, bigCommonLine.p2, new Rgb(Color.White).MCvScalar, 1);
+            // draw big common line
+
+            CvInvoke.PutText(leftRightLineImage, "Left Lines(Negative Slope)", new Point(10, 30), FontFace.HersheyPlain, 1, new Rgb(Color.Blue).MCvScalar, 1);
+            CvInvoke.PutText(leftRightLineImage, "Right Lines(Positive Slope)", new Point(10, 50), FontFace.HersheyPlain, 1, new Rgb(Color.Red).MCvScalar, 1);
+            CvInvoke.PutText(leftRightLineImage, "Big Common Line", new Point(10, 70), FontFace.HersheyPlain, 1, new Rgb(Color.White).MCvScalar, 1);
+
+            CvInvoke.Imshow("LEFT RIGHT LINED", leftRightLineImage);
+
             // drawing bounding Box of the person
-            CvInvoke.Rectangle(lineImage, frm.rec, new Rgb(Color.White).MCvScalar, 2);
+            //CvInvoke.Rectangle(lineImage, frm.rec, new Rgb(Color.White).MCvScalar, 2);
 
             // drawing the middle line of the Person
-            CvInvoke.Line(lineImage, frm.middle_line.p1, frm.middle_line.p2, new Rgb(Color.White).MCvScalar, 2);
+            //CvInvoke.Line(lineImage, frm.middle_line.p1, frm.middle_line.p2, new Rgb(Color.White).MCvScalar, 2);
 
             // Display the Image
-            CvInvoke.Imshow("Lines Framed", lineImage);
+            //CvInvoke.Imshow("Lines Framed", lineImage);
 
 
             // writig the Hough Line Image to Output Folder
