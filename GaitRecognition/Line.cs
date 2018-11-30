@@ -26,7 +26,8 @@ namespace GaitRecognition
         {
             return new LineSegment2D[10];
         }
-
+        
+        // Convert the LineSegment2D Array to List of Current Class
         public static List<Line> ConvertToList(LineSegment2D[] arrLines) {
             List<Line> lines = new List<Line>();
 
@@ -46,6 +47,47 @@ namespace GaitRecognition
                 lines.Add(l);
             }
             return lines;
+        }
+
+
+        // Divide the Lines in the different sections
+        public static List<List<Line>> GetLeftRightLines(List<Line> lines) {
+            // make a list of list to store lists of left and right lines
+            List<List<Line>> leftRightLines = new List<List<Line>>();
+
+            List<Line> leftLines = new List<Line>();
+            List<Line> rightLines = new List<Line>();
+
+            foreach (Line line in lines) {
+                if (line.slope < 0) { // if slope is negative then left lines
+                    leftLines.Add(line);
+                }
+                if (line.slope >= 0) // if slope is positive then right lines
+                {
+                    rightLines.Add(line);
+                }
+            }
+
+            leftRightLines.Add(leftLines);
+
+            leftRightLines.Add(rightLines);
+
+            return leftRightLines;
+        }
+        
+        // get the line with maximum length
+        public static Line getBigLine(List<Line> lines)
+        {
+            Line bigLine = new Line();
+            bigLine = lines[0];
+
+            foreach (Line line in lines) {
+                if (bigLine.length < line.length) {
+                    bigLine = line;
+                }
+            }
+
+            return bigLine;
         }
 
         public static Line MergeLinesBySlope(List<Line> lstLines) {
