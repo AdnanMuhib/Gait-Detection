@@ -65,6 +65,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Feature.cs" />
+    <Compile Include="FeaturePoint.cs" />
     <Compile Include="GaitRecognition.cs">
       <SubType>Form</SubType>
     </Compile>

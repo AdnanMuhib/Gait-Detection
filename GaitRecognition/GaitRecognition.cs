@@ -21,7 +21,7 @@ namespace GaitRecognition
     public partial class GaitRecognition : Form
     {
         // input and output directories for batch Processing
-        String inputFolder = @"D:\UNIVERSITY DOCUMENTS\FYP\Human Activity Recognition\KTH Dataset\Gait Pics\Ahmad\ahmad4\";
+        String inputFolder = @"D:\UNIVERSITY DOCUMENTS\FYP\Human Activity Recognition\KTH Dataset\Gait Pics\Ahmad\ahmad5\";
         String outputFolder = @"D:\UNIVERSITY DOCUMENTS\FYP\Human Activity Recognition\Test Outputs\";
 
         
@@ -46,12 +46,12 @@ namespace GaitRecognition
             this.KeyPreview = true;
             frameIndex = 0;
             //pictureViewBox.SizeMode = PictureBoxSizeMode.Zoom;
-            
+            string filename = "20.bmp";
             bgImage = new Image<Gray, byte>(inputFolder + "b.bmp").Resize(400,400,Inter.Cubic);
-            img = new Image<Gray, byte>(inputFolder + "12.bmp").Resize(400, 400, Inter.Cubic);
-            BgrImg = new Image<Bgr, byte>(inputFolder + "12.bmp").Resize(400, 400, Inter.Cubic);
+            img = new Image<Gray, byte>(inputFolder + filename).Resize(400, 400, Inter.Cubic);
+            BgrImg = new Image<Bgr, byte>(inputFolder + filename).Resize(400, 400, Inter.Cubic);
 
-            removebackground("12.bmp");
+            removebackground(filename);
             // batchProcessor();
         }
 
@@ -304,44 +304,55 @@ namespace GaitRecognition
 
 
             // Get the Big Line from top right Lines
-            Line bigCommonLine = Line.getBigLine(topRightLines);
+            Line TopRightLine = Line.getBigLine(topRightLines);
 
-            if (bigCommonLine != null)
+            if (TopRightLine != null)
             {
-                CvInvoke.Line(leftRightLineImage, bigCommonLine.p1, bigCommonLine.p2, new Bgr(Color.Red).MCvScalar, 1);
+                CvInvoke.Line(leftRightLineImage, TopRightLine.p1, TopRightLine.p2, new Bgr(Color.Red).MCvScalar, 1);
             }
 
             // Get the Big Line from top left Lines
-            bigCommonLine = Line.getBigLine(topLeftLines);
+            Line TopLeftLine = Line.getBigLine(topLeftLines);
 
-            if (bigCommonLine != null)
+            if (TopLeftLine != null)
             {
-                CvInvoke.Line(leftRightLineImage, bigCommonLine.p1, bigCommonLine.p2, new Bgr(Color.Blue).MCvScalar, 1);
+                CvInvoke.Line(leftRightLineImage, TopLeftLine.p1, TopLeftLine.p2, new Bgr(Color.Blue).MCvScalar, 1);
             }
 
             // Get the Big Line from bottom right Lines
-            bigCommonLine = Line.getBigLine(bottomRightLines);
+            Line BottomRightLine = Line.getBigLine(bottomRightLines);
 
-            if (bigCommonLine != null)
+            if (BottomRightLine != null)
             {
-                CvInvoke.Line(leftRightLineImage, bigCommonLine.p1, bigCommonLine.p2, new Bgr(Color.Red).MCvScalar, 1);
+                CvInvoke.Line(leftRightLineImage, BottomRightLine.p1, BottomRightLine.p2, new Bgr(Color.Red).MCvScalar, 1);
             }
 
             // Get the Big Line from bottom left Lines
-            bigCommonLine = Line.getBigLine(bottomLeftLines);
+            Line BottomLeftLine = Line.getBigLine(bottomLeftLines);
 
-            if (bigCommonLine != null)
+            if (BottomLeftLine != null)
             {
-                CvInvoke.Line(leftRightLineImage, bigCommonLine.p1, bigCommonLine.p2, new Bgr(Color.Blue).MCvScalar, 1);
+                CvInvoke.Line(leftRightLineImage, BottomLeftLine.p1, BottomLeftLine.p2, new Bgr(Color.Blue).MCvScalar, 1);
             }
 
             // Get the Big Line from Common Lines
-            bigCommonLine = Line.getBigLine(commonLines);
+            Line bigCommonLine = Line.getBigLine(commonLines);
 
             if (bigCommonLine != null) {
                 CvInvoke.Line(leftRightLineImage, bigCommonLine.p1, bigCommonLine.p2, new Rgb(Color.White).MCvScalar, 1);
             }
+
+            // Extract Feature Points from the Lines
+            List<FeaturePoint> featurePoints = Feature.ExtractFeaturePoints(bigCommonLine, BottomLeftLine, BottomRightLine, TopLeftLine, TopRightLine);
             
+
+            // Draw Feature Points on The Picture
+
+            foreach (FeaturePoint fp in featurePoints) {
+                CvInvoke.Circle(leftRightLineImage, fp.point, 5, new Bgr(Color.Green).MCvScalar, 2, LineType.EightConnected);
+                CvInvoke.PutText(leftRightLineImage, fp.name,fp.point, FontFace.HersheyPlain, 1, new Bgr(Color.White).MCvScalar);
+            }
+
             // draw big common line
 
             CvInvoke.PutText(leftRightLineImage, "Left Lines(Negative Slope)", new Point(10, 30), FontFace.HersheyPlain, 1, new Rgb(Color.Blue).MCvScalar, 1);
@@ -353,7 +364,7 @@ namespace GaitRecognition
                 CvInvoke.Imwrite(outputFolder + "Left_Right_" + filePath, leftRightLineImage);
             }
             CvInvoke.Imshow("LEFT RIGHT LINED", leftRightLineImage);
-
+            leftRightLineImage.Dispose();
             // drawing bounding Box of the person
             //CvInvoke.Rectangle(lineImage, frm.rec, new Rgb(Color.White).MCvScalar, 2);
 
