@@ -78,6 +78,8 @@ namespace GaitRecognition
         // get the line with maximum length
         public static Line getBigLine(List<Line> lines)
         {
+            if ( lines.Count == 0 )
+                return null;
             Line bigLine = new Line();
             bigLine = lines[0];
 

@@ -21,7 +21,7 @@ namespace GaitRecognition
     public partial class GaitRecognition : Form
     {
         // input and output directories for batch Processing
-        String inputFolder = @"D:\UNIVERSITY DOCUMENTS\FYP\Human Activity Recognition\KTH Dataset\Gait Pics\Nasir\Nasir3\";
+        String inputFolder = @"D:\UNIVERSITY DOCUMENTS\FYP\Human Activity Recognition\KTH Dataset\Gait Pics\Ahmad\ahmad4\";
         String outputFolder = @"D:\UNIVERSITY DOCUMENTS\FYP\Human Activity Recognition\Test Outputs\";
 
         
@@ -135,10 +135,10 @@ namespace GaitRecognition
             bgsubtractor.Apply(bgImage, output);
             bgsubtractor.Apply(img, output);
             pictureViewBox.Image = output;
-            output.Canny(100,100);
+            //output.Canny(100,100);
 
             CvInvoke.Erode(output, output, null, new System.Drawing.Point(-1, -1), 1, BorderType.Reflect, default(MCvScalar));
-            CvInvoke.Dilate(output, output, null, new System.Drawing.Point(-1, -1), 1, BorderType.Reflect, default(MCvScalar));
+            CvInvoke.Dilate(output, output, null, new System.Drawing.Point(-1, -1), 5, BorderType.Reflect, default(MCvScalar));
 
             // Write the Silhoutte output to the file
             if (filepath != null && saveResults == true)
@@ -281,34 +281,77 @@ namespace GaitRecognition
 
             // drawing top left lines 
             foreach (Line line in topLeftLines) {
-                CvInvoke.Line(leftRightLineImage, line.p1, line.p2, new Rgb(Color.Blue).MCvScalar, 1);
+                //CvInvoke.Line(leftRightLineImage, line.p1, line.p2, new Rgb(Color.Blue).MCvScalar, 1);
             }
 
             // drawing top right lines 
             foreach (Line line in topRightLines)
             {
-                CvInvoke.Line(leftRightLineImage, line.p1, line.p2, new Rgb(Color.Red).MCvScalar, 1);
+                //CvInvoke.Line(leftRightLineImage, line.p1, line.p2, new Rgb(Color.Red).MCvScalar, 1);
             }
             // drawing bottom left lines 
             foreach (Line line in bottomLeftLines)
             {
-                CvInvoke.Line(leftRightLineImage, line.p1, line.p2, new Rgb(Color.Blue).MCvScalar, 1);
+                //CvInvoke.Line(leftRightLineImage, line.p1, line.p2, new Rgb(Color.Blue).MCvScalar, 1);
             }
 
             // drawing bottom right lines 
             foreach (Line line in bottomRightLines)
             {
-                CvInvoke.Line(leftRightLineImage, line.p1, line.p2, new Rgb(Color.Red).MCvScalar, 1);
+                //CvInvoke.Line(leftRightLineImage, line.p1, line.p2, new Rgb(Color.Red).MCvScalar, 1);
             }
+
+
+
+            // Get the Big Line from top right Lines
+            Line bigCommonLine = Line.getBigLine(topRightLines);
+
+            if (bigCommonLine != null)
+            {
+                CvInvoke.Line(leftRightLineImage, bigCommonLine.p1, bigCommonLine.p2, new Bgr(Color.Red).MCvScalar, 1);
+            }
+
+            // Get the Big Line from top left Lines
+            bigCommonLine = Line.getBigLine(topLeftLines);
+
+            if (bigCommonLine != null)
+            {
+                CvInvoke.Line(leftRightLineImage, bigCommonLine.p1, bigCommonLine.p2, new Bgr(Color.Blue).MCvScalar, 1);
+            }
+
+            // Get the Big Line from bottom right Lines
+            bigCommonLine = Line.getBigLine(bottomRightLines);
+
+            if (bigCommonLine != null)
+            {
+                CvInvoke.Line(leftRightLineImage, bigCommonLine.p1, bigCommonLine.p2, new Bgr(Color.Red).MCvScalar, 1);
+            }
+
+            // Get the Big Line from bottom left Lines
+            bigCommonLine = Line.getBigLine(bottomLeftLines);
+
+            if (bigCommonLine != null)
+            {
+                CvInvoke.Line(leftRightLineImage, bigCommonLine.p1, bigCommonLine.p2, new Bgr(Color.Blue).MCvScalar, 1);
+            }
+
             // Get the Big Line from Common Lines
-            Line bigCommonLine = Line.getBigLine(commonLines);
-            CvInvoke.Line(leftRightLineImage, bigCommonLine.p1, bigCommonLine.p2, new Rgb(Color.White).MCvScalar, 1);
+            bigCommonLine = Line.getBigLine(commonLines);
+
+            if (bigCommonLine != null) {
+                CvInvoke.Line(leftRightLineImage, bigCommonLine.p1, bigCommonLine.p2, new Rgb(Color.White).MCvScalar, 1);
+            }
+            
             // draw big common line
 
             CvInvoke.PutText(leftRightLineImage, "Left Lines(Negative Slope)", new Point(10, 30), FontFace.HersheyPlain, 1, new Rgb(Color.Blue).MCvScalar, 1);
             CvInvoke.PutText(leftRightLineImage, "Right Lines(Positive Slope)", new Point(10, 50), FontFace.HersheyPlain, 1, new Rgb(Color.Red).MCvScalar, 1);
             CvInvoke.PutText(leftRightLineImage, "Big Common Line", new Point(10, 70), FontFace.HersheyPlain, 1, new Rgb(Color.White).MCvScalar, 1);
 
+            if (filePath != null && saveResults == true)
+            {
+                CvInvoke.Imwrite(outputFolder + "Left_Right_" + filePath, leftRightLineImage);
+            }
             CvInvoke.Imshow("LEFT RIGHT LINED", leftRightLineImage);
 
             // drawing bounding Box of the person
