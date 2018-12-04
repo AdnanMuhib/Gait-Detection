@@ -68,6 +68,7 @@ namespace GaitRecognition
                 {
                     fp = new FeaturePoint(TopLeftLine.p2, "leftarmpoint");
                 }
+                features.Add(fp);
             }
 
             // for right arm point TopRightLine with large Y Value
@@ -82,6 +83,7 @@ namespace GaitRecognition
                 {
                     fp = new FeaturePoint(TopRightLine.p2, "rightarmpoint");
                 }
+                features.Add(fp);
             }
 
             // left foot point with large Y value of BottomLeftLine
@@ -96,6 +98,7 @@ namespace GaitRecognition
                 {
                     fp = new FeaturePoint(BottomLeftLine.p2, "leftfootpoint");
                 }
+                features.Add(fp);
             }
 
             // for right foot point BottomRightLine with large Y Value
@@ -110,6 +113,7 @@ namespace GaitRecognition
                 {
                     fp = new FeaturePoint(BottomRightLine.p2, "rightfootpoint");
                 }
+                features.Add(fp);
             }
             // centroid Point will be the intersection point of bottom left line and bottom right line
             if (BottomLeftLine != null && BottomRightLine != null) {
