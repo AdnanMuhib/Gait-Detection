@@ -73,6 +73,7 @@
     <Compile Include="GaitRecognition.Designer.cs">
       <DependentUpon>GaitRecognition.cs</DependentUpon>
     </Compile>
+    <Compile Include="MLP.cs" />
     <Compile Include="PersonFrame.cs" />
     <Compile Include="Line.cs" />
     <Compile Include="Program.cs" />

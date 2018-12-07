@@ -30,7 +30,10 @@ namespace GaitRecognition
         Image<Gray, byte> img; // any input image
 
         Image<Gray, byte> bgImage; // Background Image from the video or custom input
-
+        Image<Gray, byte> previousFrame; // previous frame for Opticalflow
+        Image<Gray, byte> nextFrame; // next frame for Opticalflow
+        
+        
         int frameIndex;
 
         VideoCapture _capture; // to read video files
@@ -51,7 +54,8 @@ namespace GaitRecognition
             img = new Image<Gray, byte>(inputFolder + filename).Resize(400, 400, Inter.Cubic);
             BgrImg = new Image<Bgr, byte>(inputFolder + filename).Resize(400, 400, Inter.Cubic);
 
-            removebackground(filename);
+            //removebackground(filename);
+            //MLP mlp = new MLP();
             // batchProcessor();
         }
 
@@ -487,6 +491,7 @@ namespace GaitRecognition
                 if (frameIndex == 0)
                 {
                     bgImage = _capture.QueryFrame().ToImage<Gray, byte>();
+                    previousFrame = _capture.QueryFrame().ToImage<Gray, byte>();
                     CvInvoke.Imwrite(outputFolder + "Frame_"+ frameIndex + ".bmp", bgImage);
                 }
                 else
@@ -497,13 +502,17 @@ namespace GaitRecognition
                     {
                         try
                         {
+                            Image<Gray, byte> temp = img.Clone();
                             img = _capture.QueryFrame().ToImage<Gray, byte>();
+                            nextFrame = _capture.QueryFrame().ToImage<Gray, byte>();
                             BgrImg = _capture.QueryFrame().ToImage<Bgr, byte>();
                             //CvInvoke.Imwrite(outputFolder + "Frame_" + frameIndex + ".bmp", img);
-                            removebackground("Frame_" + frameIndex + ".bmp");
+                            //removebackground("Frame_" + frameIndex + ".bmp");
+                            OpticalFlow();
                         }
                         catch (Exception ex)
                         {
+                            //MessageBox.Show(ex.Message);
                             Application.Idle -= _capture_ImageGrabbed;
                             _capture.Pause();
                             _capture.Stop();
@@ -515,5 +524,67 @@ namespace GaitRecognition
             }
         }
 
+        // Optical Flow Implementation
+        public void OpticalFlow() {
+            Image<Gray, byte> output = new Image<Gray, byte>(bgImage.Width, bgImage.Height);
+            BackgroundSubtractorMOG2 bgsubtractor = new BackgroundSubtractorMOG2(varThreshold: 100, shadowDetection: false);
+            bgsubtractor.Apply(bgImage, output);
+            bgsubtractor.Apply(img, output);
+            
+            //output.Canny(100,100);
+
+            CvInvoke.Erode(output, output, null, new System.Drawing.Point(-1, -1), 1, BorderType.Reflect, default(MCvScalar));
+            CvInvoke.Dilate(output, output, null, new System.Drawing.Point(-1, -1), 5, BorderType.Reflect, default(MCvScalar));
+
+            // finding the Bounding Box of the Person
+            frm = new PersonFrame();
+            Rectangle rec = frm.findBoundry(output);
+            //output.ROI = rec;
+            pictureViewBox.Image = output;
+            // prep containers for x and y vectors
+            Image<Gray, float> velx = new Image<Gray, float>(new Size(rec.Width, rec.Height));
+            Image<Gray, float> vely = new Image<Gray, float>(new Size(rec.Width, rec.Height));
+
+            ///previousFrame.ROI = rec;
+            //nextFrame.ROI = rec;
+            
+            // use the optical flow algorithm.
+            CvInvoke.CalcOpticalFlowFarneback(previousFrame, nextFrame, velx,vely, 0.5, 3, 60, 3, 5, 1.1, OpticalflowFarnebackFlag.Default);
+            
+            //spictureViewBox.Image = flowMatrix;
+            // color each pixel
+            Image<Hsv, Byte> coloredMotion = new Image<Hsv, Byte>(new Size(rec.Width, rec.Height));
+            for (int i = 0; i < coloredMotion.Width; i++)
+            {
+                for (int j = 0; j < coloredMotion.Height; j++)
+                {
+                    // Pull the relevant intensities from the velx and vely matrices
+                    double velxHere = velx[j, i].Intensity;
+                    double velyHere = vely[j, i].Intensity;
+
+                    // Determine the color (i.e, the angle)
+                    double degrees = Math.Atan(velyHere / velxHere) / Math.PI * 90 + 45;
+                    if (velxHere < 0)
+                    {
+                        degrees += 90;
+                    }
+                    coloredMotion.Data[j, i, 0] = (Byte)degrees;
+                    coloredMotion.Data[j, i, 1] = 255;
+
+                    // Determine the intensity (i.e, the distance)
+                    double intensity = Math.Sqrt(velxHere * velxHere + velyHere * velyHere) * 10;
+                    coloredMotion.Data[j, i, 2] = (intensity > 255) ? (byte)255 : (byte)intensity;
+                }
+            }
+            // coloredMotion is now an image that shows intensity of motion by lightness
+            // and direction by color.
+            //pictureViewBox.Image = coloredMotion;
+            previousFrame.Dispose();
+            previousFrame = img.Clone();
+            img.Dispose();
+            nextFrame.Dispose();
+            coloredMotion.Dispose();
+
+        }
     }
 }
