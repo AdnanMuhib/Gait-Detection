@@ -35,3 +35,4 @@ C:\Users\Antivirus\Documents\Visual Studio 2015\Projects\GaitRecognition\GaitRec
 C:\Users\Antivirus\Documents\Visual Studio 2015\Projects\GaitRecognition\GaitRecognition\bin\Debug\tr\ZedGraph.resources.dll
 C:\Users\Antivirus\Documents\Visual Studio 2015\Projects\GaitRecognition\GaitRecognition\bin\Debug\zh-tw\ZedGraph.resources.dll
 C:\Users\Antivirus\Documents\Visual Studio 2015\Projects\GaitRecognition\GaitRecognition\obj\Debug\GaitRecognition.GaitRecognition.resources
+C:\Users\Antivirus\Documents\Visual Studio 2015\Projects\GaitRecognition\GaitRecognition\obj\Debug\GaitRecognition.OFStudioForm.resources
