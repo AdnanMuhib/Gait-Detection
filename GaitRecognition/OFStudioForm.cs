@@ -36,7 +36,7 @@ namespace GaitRecognition
             videoPath = "";
             frameSkip = 1;
             frameCounter = 0;
-
+            
             DsDevice[] _SystemCameras = DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);
 
             // if there is any camera
@@ -76,7 +76,7 @@ namespace GaitRecognition
                             //BgrImage = _capture.QueryFrame().ToImage<Bgr, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Area);
                             //pictureViewBox.Image = BgrImage;
                             nextFrame = _capture.QueryFrame().ToImage<Gray, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Area);
-                            opticalViewBox.Image = OpticalFlow.CalculateOpticalFlow(prevFrame, nextFrame);
+                            opticalViewBox.Image = OpticalFlow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter);
                             pictureViewBox.Image = nextFrame;
                             prevFrame = nextFrame.Clone();
                             nextFrame.Dispose();
@@ -117,7 +117,7 @@ namespace GaitRecognition
                             //pictureViewBox.Image = _frame.ToImage<Bgr, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Cubic);
                             nextFrame = _frame.ToImage<Gray, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Cubic);
                             pictureViewBox.Image = nextFrame;
-                            opticalViewBox.Image =  OpticalFlow.CalculateOpticalFlow(prevFrame, nextFrame);
+                            opticalViewBox.Image =  OpticalFlow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter);
                             prevFrame = nextFrame.Clone();
                             nextFrame.Dispose();
                         }
