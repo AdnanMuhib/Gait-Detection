@@ -19,6 +19,8 @@ namespace GaitRecognition
         VideoCapture _capture;
         bool isPlaying = false;
         public String videoPath;
+        int frameSkip;
+        int frameCounter;
 
         Image<Gray, byte> grayImage;
         Image<Bgr, byte> BgrImage;
@@ -27,11 +29,13 @@ namespace GaitRecognition
 
         public OFStudioForm()
         {
-            videoPath = "";
+            
             InitializeComponent();
             // make a list of connected cameras to the computer
             List<String> cameras = new List<string>();
-
+            videoPath = "";
+            frameSkip = 1;
+            frameCounter = 0;
 
             DsDevice[] _SystemCameras = DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);
 
@@ -55,16 +59,19 @@ namespace GaitRecognition
             
         private void imageFrameCaptured(object sender, EventArgs e)
         {
+            frameCounter = frameCounter + 1;
 
             // Handle Every Frame if Video is Playing
+
             if (radioButtonVideo.Checked) {
                 try
                 {
                     if (_capture != null)
                     {
-
-                        BgrImage = _capture.QueryFrame().ToImage<Bgr, byte>().Resize(300, 300, Emgu.CV.CvEnum.Inter.Area);
-                        pictureViewBox.Image = BgrImage;
+                        if (frameCounter % frameSkip == 0) { // use only the frames after skipped frames
+                            BgrImage = _capture.QueryFrame().ToImage<Bgr, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Area);
+                            pictureViewBox.Image = BgrImage;
+                        }
                         //CvInvoke.Imshow("Frame ", BgrImage);
                         //_frame.Dispose();
                     }
@@ -73,10 +80,14 @@ namespace GaitRecognition
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
-                    _capture.Pause();
 
+                    _capture.Pause();
                     // detach the callback function
                     _capture.ImageGrabbed -= imageFrameCaptured;
+
+                    _capture.Dispose();
+                    _capture = null;
+
                     isPlaying = false;
                     // change the button icon to play
                     btnPlayPause.BackgroundImage = Properties.Resources.play36;
@@ -89,8 +100,15 @@ namespace GaitRecognition
                 {
                     if (_capture != null)
                     {
-                        _capture.Retrieve(_frame, 0);
-                        pictureViewBox.Image = _frame.ToImage<Bgr, byte>().Resize(300,300,Emgu.CV.CvEnum.Inter.Cubic);
+                        if (frameSkip != 0)
+                        {
+
+                            if (frameCounter % frameSkip == 0) { // use only the frames after skipped frames
+                                _capture.Retrieve(_frame, 0);
+                                pictureViewBox.Image = _frame.ToImage<Bgr, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Cubic);
+                            }
+                        }
+                        
                         //CvInvoke.Imshow("Frame ", BgrImage);
                         //_frame.Dispose();
                     }
@@ -102,6 +120,9 @@ namespace GaitRecognition
                     _capture.Pause();
                     // detach the callback function
                     _capture.ImageGrabbed -= imageFrameCaptured;
+
+                    _capture.Dispose();
+                    _capture = null;
                     isPlaying = false;
                     // change the button icon to play
                     btnPlayPause.BackgroundImage = Properties.Resources.play36;
@@ -143,7 +164,6 @@ namespace GaitRecognition
                     // change the button icon to play
                     btnPlayPause.BackgroundImage = Properties.Resources.play36;
                 }
-
                 else if (!isPlaying && _capture == null) // check if camera is not or it's first time for camera
                 {
                     _capture = new VideoCapture();
@@ -172,7 +192,6 @@ namespace GaitRecognition
                     btnPlayPause.BackgroundImage = Properties.Resources.play36;
                     isPlaying = false;
                 }
-
                 // if video path is selected and video not playing
                 else if (!isPlaying && videoPath != "")
                 {
@@ -197,6 +216,7 @@ namespace GaitRecognition
                 btnPlayPause.BackgroundImage = Properties.Resources.play36;
                 isPlaying = false;
                 pictureViewBox.Image = null;
+                _capture = null;
             }
         }
 
@@ -206,6 +226,12 @@ namespace GaitRecognition
             textBoxVideoPath.Text = videoPath;
             btnPlayPause.BackgroundImage = Properties.Resources.play36;
             isPlaying = false;
+            frameCounter = 0;
+        }
+
+        private void numericFrameSkip_ValueChanged(object sender, EventArgs e)
+        {
+            frameSkip = (int)numericFrameSkip.Value;
         }
     }
 }

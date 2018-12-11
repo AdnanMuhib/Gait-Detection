@@ -36,6 +36,7 @@
             this.MainPanel = new System.Windows.Forms.Panel();
             this.OpticalFlowPanel = new System.Windows.Forms.Panel();
             this.opticalViewBox = new Emgu.CV.UI.ImageBox();
+            this.opticalFlowFooterPanel = new System.Windows.Forms.Panel();
             this.VideoPlayerPanel = new System.Windows.Forms.Panel();
             this.pictureViewBox = new Emgu.CV.UI.ImageBox();
             this.panelPlayerControls = new System.Windows.Forms.Panel();
@@ -49,7 +50,6 @@
             this.comboBoxCameraList = new System.Windows.Forms.ComboBox();
             this.radioButtonVideo = new System.Windows.Forms.RadioButton();
             this.radioButtonCamera = new System.Windows.Forms.RadioButton();
-            this.opticalFlowFooterPanel = new System.Windows.Forms.Panel();
             this.MainMenu.SuspendLayout();
             this.MainPanel.SuspendLayout();
             this.OpticalFlowPanel.SuspendLayout();
@@ -122,6 +122,14 @@
             this.opticalViewBox.Size = new System.Drawing.Size(460, 350);
             this.opticalViewBox.TabIndex = 2;
             this.opticalViewBox.TabStop = false;
+            // 
+            // opticalFlowFooterPanel
+            // 
+            this.opticalFlowFooterPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.opticalFlowFooterPanel.Location = new System.Drawing.Point(0, 350);
+            this.opticalFlowFooterPanel.Name = "opticalFlowFooterPanel";
+            this.opticalFlowFooterPanel.Size = new System.Drawing.Size(460, 55);
+            this.opticalFlowFooterPanel.TabIndex = 3;
             // 
             // VideoPlayerPanel
             // 
@@ -215,6 +223,7 @@
             0,
             0,
             0});
+            this.numericFrameSkip.ValueChanged += new System.EventHandler(this.numericFrameSkip_ValueChanged);
             // 
             // btnBrowseVideo
             // 
@@ -264,14 +273,6 @@
             this.radioButtonCamera.Text = "Live Camera";
             this.radioButtonCamera.UseVisualStyleBackColor = true;
             this.radioButtonCamera.CheckedChanged += new System.EventHandler(this.radioButtonCamera_CheckedChanged);
-            // 
-            // opticalFlowFooterPanel
-            // 
-            this.opticalFlowFooterPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.opticalFlowFooterPanel.Location = new System.Drawing.Point(0, 350);
-            this.opticalFlowFooterPanel.Name = "opticalFlowFooterPanel";
-            this.opticalFlowFooterPanel.Size = new System.Drawing.Size(460, 55);
-            this.opticalFlowFooterPanel.TabIndex = 3;
             // 
             // OFStudioForm
             // 
