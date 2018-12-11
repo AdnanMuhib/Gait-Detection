@@ -68,12 +68,19 @@ namespace GaitRecognition
                 {
                     if (_capture != null)
                     {
-                        if (frameCounter % frameSkip == 0) { // use only the frames after skipped frames
-                            BgrImage = _capture.QueryFrame().ToImage<Bgr, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Area);
-                            pictureViewBox.Image = BgrImage;
+                        if (frameCounter == 1) {
+                            prevFrame =  _capture.QueryFrame().ToImage<Gray, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Area);
+
                         }
-                        //CvInvoke.Imshow("Frame ", BgrImage);
-                        //_frame.Dispose();
+                        else if (frameCounter % frameSkip == 0) { // use only the frames after skipped frames
+                            //BgrImage = _capture.QueryFrame().ToImage<Bgr, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Area);
+                            //pictureViewBox.Image = BgrImage;
+                            nextFrame = _capture.QueryFrame().ToImage<Gray, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Area);
+                            opticalViewBox.Image = OpticalFlow.CalculateOpticalFlow(prevFrame, nextFrame);
+                            pictureViewBox.Image = nextFrame;
+                            prevFrame = nextFrame.Clone();
+                            nextFrame.Dispose();
+                        }
                     }
 
                 }
@@ -100,17 +107,20 @@ namespace GaitRecognition
                 {
                     if (_capture != null)
                     {
-                        if (frameSkip != 0)
+                        if (frameCounter == 1)
                         {
-
-                            if (frameCounter % frameSkip == 0) { // use only the frames after skipped frames
-                                _capture.Retrieve(_frame, 0);
-                                pictureViewBox.Image = _frame.ToImage<Bgr, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Cubic);
-                            }
+                            _capture.Retrieve(_frame, 0);
+                            prevFrame = _frame.ToImage<Gray, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Cubic);
                         }
-                        
-                        //CvInvoke.Imshow("Frame ", BgrImage);
-                        //_frame.Dispose();
+                        else if (frameCounter % frameSkip == 0) { // use only the frames after skipped frames
+                            _capture.Retrieve(_frame, 0);
+                            //pictureViewBox.Image = _frame.ToImage<Bgr, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Cubic);
+                            nextFrame = _frame.ToImage<Gray, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Cubic);
+                            pictureViewBox.Image = nextFrame;
+                            opticalViewBox.Image =  OpticalFlow.CalculateOpticalFlow(prevFrame, nextFrame);
+                            prevFrame = nextFrame.Clone();
+                            nextFrame.Dispose();
+                        }
                     }
 
                 }

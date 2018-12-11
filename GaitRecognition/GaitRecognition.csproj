@@ -84,6 +84,7 @@
     <Compile Include="OFStudioForm.Designer.cs">
       <DependentUpon>OFStudioForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="OpticalFlow.cs" />
     <Compile Include="PersonFrame.cs" />
     <Compile Include="Line.cs" />
     <Compile Include="Program.cs" />
