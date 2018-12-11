@@ -35,7 +35,9 @@
             this.aboutMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.MainPanel = new System.Windows.Forms.Panel();
             this.OpticalFlowPanel = new System.Windows.Forms.Panel();
+            this.opticalViewBox = new Emgu.CV.UI.ImageBox();
             this.VideoPlayerPanel = new System.Windows.Forms.Panel();
+            this.pictureViewBox = new Emgu.CV.UI.ImageBox();
             this.panelPlayerControls = new System.Windows.Forms.Panel();
             this.btnStop = new System.Windows.Forms.Button();
             this.btnPlayPause = new System.Windows.Forms.Button();
@@ -47,17 +49,16 @@
             this.comboBoxCameraList = new System.Windows.Forms.ComboBox();
             this.radioButtonVideo = new System.Windows.Forms.RadioButton();
             this.radioButtonCamera = new System.Windows.Forms.RadioButton();
-            this.pictureViewBox = new Emgu.CV.UI.ImageBox();
-            this.opticalViewBox = new Emgu.CV.UI.ImageBox();
+            this.opticalFlowFooterPanel = new System.Windows.Forms.Panel();
             this.MainMenu.SuspendLayout();
             this.MainPanel.SuspendLayout();
             this.OpticalFlowPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.opticalViewBox)).BeginInit();
             this.VideoPlayerPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureViewBox)).BeginInit();
             this.panelPlayerControls.SuspendLayout();
             this.HeaderPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericFrameSkip)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureViewBox)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.opticalViewBox)).BeginInit();
             this.SuspendLayout();
             // 
             // MainMenu
@@ -103,22 +104,49 @@
             // 
             // OpticalFlowPanel
             // 
+            this.OpticalFlowPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.OpticalFlowPanel.Controls.Add(this.opticalViewBox);
-            this.OpticalFlowPanel.Dock = System.Windows.Forms.DockStyle.Right;
+            this.OpticalFlowPanel.Controls.Add(this.opticalFlowFooterPanel);
             this.OpticalFlowPanel.Location = new System.Drawing.Point(500, 100);
+            this.OpticalFlowPanel.MaximumSize = new System.Drawing.Size(550, 405);
             this.OpticalFlowPanel.Name = "OpticalFlowPanel";
             this.OpticalFlowPanel.Size = new System.Drawing.Size(460, 405);
             this.OpticalFlowPanel.TabIndex = 2;
             // 
+            // opticalViewBox
+            // 
+            this.opticalViewBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.opticalViewBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.opticalViewBox.Location = new System.Drawing.Point(0, 0);
+            this.opticalViewBox.Name = "opticalViewBox";
+            this.opticalViewBox.Size = new System.Drawing.Size(460, 350);
+            this.opticalViewBox.TabIndex = 2;
+            this.opticalViewBox.TabStop = false;
+            // 
             // VideoPlayerPanel
             // 
+            this.VideoPlayerPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.VideoPlayerPanel.Controls.Add(this.pictureViewBox);
             this.VideoPlayerPanel.Controls.Add(this.panelPlayerControls);
-            this.VideoPlayerPanel.Dock = System.Windows.Forms.DockStyle.Left;
             this.VideoPlayerPanel.Location = new System.Drawing.Point(0, 100);
+            this.VideoPlayerPanel.MaximumSize = new System.Drawing.Size(500, 405);
             this.VideoPlayerPanel.Name = "VideoPlayerPanel";
             this.VideoPlayerPanel.Size = new System.Drawing.Size(460, 405);
             this.VideoPlayerPanel.TabIndex = 1;
+            // 
+            // pictureViewBox
+            // 
+            this.pictureViewBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.pictureViewBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pictureViewBox.Location = new System.Drawing.Point(0, 0);
+            this.pictureViewBox.Name = "pictureViewBox";
+            this.pictureViewBox.Size = new System.Drawing.Size(460, 350);
+            this.pictureViewBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pictureViewBox.TabIndex = 2;
+            this.pictureViewBox.TabStop = false;
             // 
             // panelPlayerControls
             // 
@@ -139,6 +167,7 @@
             this.btnStop.Size = new System.Drawing.Size(75, 38);
             this.btnStop.TabIndex = 1;
             this.btnStop.UseVisualStyleBackColor = true;
+            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
             // 
             // btnPlayPause
             // 
@@ -195,6 +224,7 @@
             this.btnBrowseVideo.TabIndex = 5;
             this.btnBrowseVideo.Text = "Browse";
             this.btnBrowseVideo.UseVisualStyleBackColor = true;
+            this.btnBrowseVideo.Click += new System.EventHandler(this.btnBrowseVideo_Click);
             // 
             // textBoxVideoPath
             // 
@@ -235,23 +265,13 @@
             this.radioButtonCamera.UseVisualStyleBackColor = true;
             this.radioButtonCamera.CheckedChanged += new System.EventHandler(this.radioButtonCamera_CheckedChanged);
             // 
-            // pictureViewBox
+            // opticalFlowFooterPanel
             // 
-            this.pictureViewBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureViewBox.Location = new System.Drawing.Point(0, 0);
-            this.pictureViewBox.Name = "pictureViewBox";
-            this.pictureViewBox.Size = new System.Drawing.Size(460, 350);
-            this.pictureViewBox.TabIndex = 2;
-            this.pictureViewBox.TabStop = false;
-            // 
-            // opticalViewBox
-            // 
-            this.opticalViewBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.opticalViewBox.Location = new System.Drawing.Point(0, 0);
-            this.opticalViewBox.Name = "opticalViewBox";
-            this.opticalViewBox.Size = new System.Drawing.Size(460, 405);
-            this.opticalViewBox.TabIndex = 2;
-            this.opticalViewBox.TabStop = false;
+            this.opticalFlowFooterPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.opticalFlowFooterPanel.Location = new System.Drawing.Point(0, 350);
+            this.opticalFlowFooterPanel.Name = "opticalFlowFooterPanel";
+            this.opticalFlowFooterPanel.Size = new System.Drawing.Size(460, 55);
+            this.opticalFlowFooterPanel.TabIndex = 3;
             // 
             // OFStudioForm
             // 
@@ -267,13 +287,13 @@
             this.MainMenu.PerformLayout();
             this.MainPanel.ResumeLayout(false);
             this.OpticalFlowPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.opticalViewBox)).EndInit();
             this.VideoPlayerPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureViewBox)).EndInit();
             this.panelPlayerControls.ResumeLayout(false);
             this.HeaderPanel.ResumeLayout(false);
             this.HeaderPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericFrameSkip)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureViewBox)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.opticalViewBox)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -301,5 +321,6 @@
         private System.Windows.Forms.Button btnPlayPause;
         private Emgu.CV.UI.ImageBox opticalViewBox;
         private Emgu.CV.UI.ImageBox pictureViewBox;
+        private System.Windows.Forms.Panel opticalFlowFooterPanel;
     }
 }

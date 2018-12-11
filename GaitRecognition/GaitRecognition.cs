@@ -80,7 +80,7 @@ namespace GaitRecognition
         }
          
         // Open File Selection Dialogue Box
-        public String openFileDialogue() {
+        public static String openFileDialogue() {
             OpenFileDialog f = new OpenFileDialog();
             if (f.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
@@ -492,7 +492,7 @@ namespace GaitRecognition
                 {
                     bgImage = _capture.QueryFrame().ToImage<Gray, byte>();
                     previousFrame = _capture.QueryFrame().ToImage<Gray, byte>();
-                    CvInvoke.Imwrite(outputFolder + "Frame_"+ frameIndex + ".bmp", bgImage);
+                    //CvInvoke.Imwrite(outputFolder + "Frame_"+ frameIndex + ".bmp", bgImage);
                 }
                 else
                 {
@@ -526,7 +526,7 @@ namespace GaitRecognition
 
         // Optical Flow Implementation
         public void OpticalFlow() {
-            Image<Gray, byte> output = new Image<Gray, byte>(bgImage.Width, bgImage.Height);
+           /* Image<Gray, byte> output = new Image<Gray, byte>(bgImage.Width, bgImage.Height);
             BackgroundSubtractorMOG2 bgsubtractor = new BackgroundSubtractorMOG2(varThreshold: 100, shadowDetection: false);
             bgsubtractor.Apply(bgImage, output);
             bgsubtractor.Apply(img, output);
@@ -540,10 +540,10 @@ namespace GaitRecognition
             frm = new PersonFrame();
             Rectangle rec = frm.findBoundry(output);
             //output.ROI = rec;
-            pictureViewBox.Image = output;
+            pictureViewBox.Image = output;*/
             // prep containers for x and y vectors
-            Image<Gray, float> velx = new Image<Gray, float>(new Size(rec.Width, rec.Height));
-            Image<Gray, float> vely = new Image<Gray, float>(new Size(rec.Width, rec.Height));
+            Image<Gray, float> velx = new Image<Gray, float>(new Size(img.Width, img.Height));
+            Image<Gray, float> vely = new Image<Gray, float>(new Size(img.Width, img.Height));
 
             ///previousFrame.ROI = rec;
             //nextFrame.ROI = rec;
@@ -553,7 +553,7 @@ namespace GaitRecognition
             
             //spictureViewBox.Image = flowMatrix;
             // color each pixel
-            Image<Hsv, Byte> coloredMotion = new Image<Hsv, Byte>(new Size(rec.Width, rec.Height));
+            Image<Hsv, Byte> coloredMotion = new Image<Hsv, Byte>(new Size(img.Width, img.Height));
             for (int i = 0; i < coloredMotion.Width; i++)
             {
                 for (int j = 0; j < coloredMotion.Height; j++)
@@ -578,7 +578,7 @@ namespace GaitRecognition
             }
             // coloredMotion is now an image that shows intensity of motion by lightness
             // and direction by color.
-            //pictureViewBox.Image = coloredMotion;
+            pictureViewBox.Image = coloredMotion;
             previousFrame.Dispose();
             previousFrame = img.Clone();
             img.Dispose();
