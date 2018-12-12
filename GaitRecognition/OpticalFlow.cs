@@ -1,6 +1,7 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
+using Emgu.CV.Features2D;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -8,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Emgu.CV.Util;
 
 namespace GaitRecognition
 {
@@ -245,9 +247,14 @@ namespace GaitRecognition
             Image<Gray, float> velx = new Image<Gray, float>(new Size(prevFrame.Width, prevFrame.Height));
             Image<Gray, float> vely = new Image<Gray, float>(new Size(prevFrame.Width, prevFrame.Height));
 
+            //GFTTDetector featureDetector = new GFTTDetector(10, 0.01, 10, 3);
+            //MKeyPoint[] featurePoints = featureDetector.Detect(prevFrame);
+            //MKeyPoint[] fp2;
+            //CvInvoke.CalcOpticalFlowPyrLK(prevFrame,nextFrame, featurePoints, fp2,);
+
             CvInvoke.CalcOpticalFlowFarneback(prevFrame, nextFrame, velx, vely, 0.5, 3, 60, 3, 5, 1.1, OpticalflowFarnebackFlag.Default);
             //Image<Hsv, Byte> coloredMotion = new Image<Hsv, Byte>(new Size(prevFrame.Width, prevFrame.Height));
-
+            
             
             //StreamWriter fs = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\opticalflow" + (frameNumber -1) + "-" + (frameNumber) + ".csv");
             //fs.WriteLine("velx," + "vely," + "degrees," + "distance");
@@ -298,6 +305,30 @@ namespace GaitRecognition
             //CvInvoke.Imshow("Lightness Motion", coloredMotion);
             return coloredMotion;
         }
+        public void PyrLkOpticalFlow(Image<Gray, byte> prevFrame, Image<Gray, byte> nextFrame)
+        {
+
+            //Get the Optical flow of L-K feature
+            Image<Gray, Byte> mask = prevFrame.Clone();
+            GFTTDetector detector = new GFTTDetector(30, 0.01, 10, 3, false, 0.04);
+            MKeyPoint[] fp1 =  detector.Detect(prevFrame, null);
+            VectorOfPointF vp1 = new VectorOfPointF(fp1.Select(x => x.Point).ToArray());
+            VectorOfPointF vp2 = new VectorOfPointF(vp1.Size);
+            VectorOfByte vstatus = new VectorOfByte(vp1.Size);
+            VectorOfFloat verr = new VectorOfFloat(vp1.Size);
+            Size winsize = new Size(prevFrame.Width, prevFrame.Height);
+            int maxLevel = 1; // if 0, winsize is not used
+            MCvTermCriteria criteria = new MCvTermCriteria(10, 1);
+
+                try
+                {
+                   CvInvoke.CalcOpticalFlowPyrLK(prevFrame, nextFrame, vp1, vp2, vstatus, verr, winsize, maxLevel, criteria);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+         }
 
         private  Point ComputerSecondPoint(Point p1, double theta, double distance) {
             Point p2 = new Point();

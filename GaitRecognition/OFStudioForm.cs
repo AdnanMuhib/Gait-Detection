@@ -71,14 +71,14 @@ namespace GaitRecognition
                     {
                         if (frameCounter == 1) {
                             prevFrame =  _capture.QueryFrame().ToImage<Gray, byte>().Resize(200, 200, Emgu.CV.CvEnum.Inter.Area);
-
                         }
                         else if (frameCounter % frameSkip == 0) { // use only the frames after skipped frames
                             //BgrImage = _capture.QueryFrame().ToImage<Bgr, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Area);
                             //pictureViewBox.Image = BgrImage;
                             nextFrame = _capture.QueryFrame().ToImage<Gray, byte>().Resize(200, 200, Emgu.CV.CvEnum.Inter.Area);
-                            opticalViewBox.Image = _opticalflow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter);
-                            pictureViewBox.Image = nextFrame;
+                           // opticalViewBox.Image = _opticalflow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter);
+                            _opticalflow.PyrLkOpticalFlow(prevFrame, nextFrame);
+                            //pictureViewBox.Image = nextFrame;
                             prevFrame = nextFrame.Clone();
                             nextFrame.Dispose();
                         }
