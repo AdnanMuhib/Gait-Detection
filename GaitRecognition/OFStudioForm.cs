@@ -26,7 +26,7 @@ namespace GaitRecognition
         Image<Bgr, byte> BgrImage;
         Image<Gray, byte> prevFrame;
         Image<Gray, byte> nextFrame;
-
+        OpticalFlow _opticalflow;
         public OFStudioForm()
         {
             
@@ -34,7 +34,7 @@ namespace GaitRecognition
             // make a list of connected cameras to the computer
             List<String> cameras = new List<string>();
             videoPath = "";
-            frameSkip = 10;
+            frameSkip = 5;
             frameCounter = 0;
             
             DsDevice[] _SystemCameras = DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);
@@ -53,6 +53,7 @@ namespace GaitRecognition
             // show the list of cameras in the drop down list
             comboBoxCameraList.DataSource = cameras;
 
+            _opticalflow = new OpticalFlow();
         }
 
         Mat _frame = new Mat();
@@ -76,7 +77,7 @@ namespace GaitRecognition
                             //BgrImage = _capture.QueryFrame().ToImage<Bgr, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Area);
                             //pictureViewBox.Image = BgrImage;
                             nextFrame = _capture.QueryFrame().ToImage<Gray, byte>().Resize(200, 200, Emgu.CV.CvEnum.Inter.Area);
-                            opticalViewBox.Image = OpticalFlow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter);
+                            opticalViewBox.Image = _opticalflow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter);
                             pictureViewBox.Image = nextFrame;
                             prevFrame = nextFrame.Clone();
                             nextFrame.Dispose();
@@ -118,7 +119,7 @@ namespace GaitRecognition
                             //pictureViewBox.Image = _frame.ToImage<Bgr, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Cubic);
                             nextFrame = _frame.ToImage<Gray, byte>().Resize(200, 200, Emgu.CV.CvEnum.Inter.Cubic);
                             pictureViewBox.Image = nextFrame;
-                            opticalViewBox.Image =  OpticalFlow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter);
+                            opticalViewBox.Image =  _opticalflow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter);
                             prevFrame = nextFrame.Clone();
                             nextFrame.Dispose();
                         }

@@ -28,6 +28,31 @@ namespace GaitRecognition
         Rectangle bottom_middle;
         Rectangle bottom_right;
 
+        List<LineSegment2D> top_left_lines;
+        List<LineSegment2D> top_middle_lines;
+        List<LineSegment2D> top_right_lines;
+
+        List<LineSegment2D> middle_left_lines;
+        List<LineSegment2D> middle_middle_lines;
+        List<LineSegment2D> middle_right_lines;
+
+        List<LineSegment2D> bottom_left_lines;
+        List<LineSegment2D> bottom_middle_lines;
+        List<LineSegment2D> bottom_right_lines;
+
+        LineSegment2D top_left_line;
+        LineSegment2D top_middle_line;
+        LineSegment2D top_right_line;
+
+        LineSegment2D middle_left_line;
+        LineSegment2D middle_middle_line;
+        LineSegment2D middle_right_line;
+
+        LineSegment2D bottom_left_line;
+        LineSegment2D bottom_middle_line;
+        LineSegment2D bottom_right_line;
+
+        List<LineSegment2D> all_lines;
         public OpticalFlow() {
             top_left = new Rectangle();
             top_middle = new Rectangle();
@@ -40,9 +65,35 @@ namespace GaitRecognition
             bottom_left = new Rectangle();
             bottom_middle = new Rectangle();
             bottom_right = new Rectangle();
+
+            top_left_lines = new List<LineSegment2D>();
+            top_middle_lines = new List<LineSegment2D>();
+            top_right_lines = new List<LineSegment2D>();
+
+            middle_left_lines = new List<LineSegment2D>();
+            middle_middle_lines = new List<LineSegment2D>();
+            middle_right_lines = new List<LineSegment2D>();
+
+            bottom_left_lines = new List<LineSegment2D>();
+            bottom_middle_lines = new List<LineSegment2D>();
+            bottom_right_lines = new List<LineSegment2D>();
+
+            top_left_line = new LineSegment2D(new Point(0, 0), new Point(0, 0));
+            top_middle_line = new LineSegment2D(new Point(0, 0), new Point(0, 0));
+            top_right_line = new LineSegment2D(new Point(0, 0), new Point(0, 0));
+
+            middle_left_line = new LineSegment2D(new Point(0, 0), new Point(0, 0));
+            middle_middle_line = new LineSegment2D(new Point(0, 0), new Point(0, 0));
+            middle_right_line = new LineSegment2D(new Point(0, 0), new Point(0, 0));
+
+            bottom_left_line = new LineSegment2D(new Point(0, 0), new Point(0, 0));
+            bottom_middle_line = new LineSegment2D(new Point(0, 0), new Point(0, 0));
+            bottom_right_line = new LineSegment2D(new Point(0, 0), new Point(0, 0));
+
+            all_lines = new List<LineSegment2D>();
         }
 
-        public  Image<Hsv, byte> CalculateSections(Image<Gray, byte> frameImg) {
+        public  Image<Hsv, byte> CalculateSections(Image<Hsv, byte> frameImg, int frameNumber = 0) {
             // resultant Image
             Image<Hsv, byte> img = new Image<Hsv, byte>(frameImg.Width, frameImg.Height);
 
@@ -81,14 +132,115 @@ namespace GaitRecognition
             CvInvoke.Rectangle(img, bottom_middle, new Bgr(Color.Blue).MCvScalar, 2);
             CvInvoke.Rectangle(img, bottom_right, new Bgr(Color.Green).MCvScalar, 2);
 
+            // assigning the lines to their respective section list
+            foreach (LineSegment2D line in all_lines) {
+                
+
+                // first row sections
+                if (line.P1.X < section_width && line.P2.X < section_width && line.P1.Y < section_height && line.P2.Y < section_height)
+                {
+                    top_left_lines.Add(line);
+                }
+                else if (line.P1.X < 2 * section_width && line.P2.X < 2 * section_width && line.P1.Y < section_height && line.P2.Y < section_height)
+                {
+                    top_middle_lines.Add(line);
+                }
+                else if (line.P1.X < w && line.P2.X < w && line.P1.Y < section_height && line.P2.Y < section_height) {
+                    top_right_lines.Add(line);
+                }
+                // middle row sections
+                else if (line.P1.X < section_width && line.P2.X < section_width && line.P1.Y < 2* section_height && line.P2.Y < 2* section_height)
+                {
+                    middle_left_lines.Add(line);
+                }
+                else if (line.P1.X < 2 * section_width && line.P2.X < 2 * section_width && line.P1.Y < 2* section_height && line.P2.Y < 2* section_height)
+                {
+                    middle_middle_lines.Add(line);
+                }
+                else if (line.P1.X < w && line.P2.X < w && line.P1.Y < 2* section_height && line.P2.Y < 2 * section_height)
+                {
+                    middle_right_lines.Add(line);
+                }
+                // third row sections
+                else if (line.P1.X < section_width && line.P2.X < section_width && line.P1.Y < h && line.P2.Y < h)
+                {
+                    top_left_lines.Add(line);
+                }
+                else if (line.P1.X < 2 * section_width && line.P2.X < 2 * section_width && line.P1.Y < h && line.P2.Y < h)
+                {
+                    top_middle_lines.Add(line);
+                }
+                else if (line.P1.X < w && line.P2.X < w && line.P1.Y < h && line.P2.Y < h)
+                {
+                    top_right_lines.Add(line);
+                }
+            }
+
+            // get line with maximum Length from each section list of lines
+            // And Draw the line on the image
+
+            if (top_left_lines.Count > 0) {
+                top_left_line = getBigLine(top_left_lines);
+                CvInvoke.ArrowedLine(img, top_left_line.P1, top_left_line.P2, new Bgr(Color.White).MCvScalar, 1);
+            }
+
+            if (top_middle_lines.Count > 0)
+            {
+                top_middle_line = getBigLine(top_middle_lines);
+                CvInvoke.ArrowedLine(img, top_middle_line.P1, top_middle_line.P2, new Bgr(Color.White).MCvScalar, 1);
+            }
+
+            if (top_right_lines.Count > 0)
+            {
+                top_right_line = getBigLine(top_right_lines);
+                CvInvoke.ArrowedLine(img, top_right_line.P1, top_right_line.P2, new Bgr(Color.White).MCvScalar, 1);
+            }
+
+
+            if (middle_left_lines.Count > 0)
+            {
+                middle_left_line = getBigLine(middle_left_lines);
+                CvInvoke.ArrowedLine(img, middle_left_line.P1, middle_left_line.P2, new Bgr(Color.White).MCvScalar, 1);
+            }
+
+            if (middle_middle_lines.Count > 0)
+            {
+                middle_middle_line = getBigLine(middle_middle_lines);
+                CvInvoke.ArrowedLine(img, middle_middle_line.P1, middle_middle_line.P2, new Bgr(Color.White).MCvScalar, 1);
+            }
+
+            if (middle_right_lines.Count > 0)
+            {
+                middle_right_line = getBigLine(middle_right_lines);
+                CvInvoke.ArrowedLine(img, middle_right_line.P1, middle_right_line.P2, new Bgr(Color.White).MCvScalar, 1);
+            }
+
+
+            if (bottom_left_lines.Count > 0)
+            {
+                bottom_left_line = getBigLine(bottom_left_lines);
+                CvInvoke.ArrowedLine(img, bottom_left_line.P1, bottom_left_line.P2, new Bgr(Color.White).MCvScalar, 1);
+            }
+            if (bottom_middle_lines.Count > 0)
+            {
+                bottom_middle_line = getBigLine(bottom_middle_lines);
+                CvInvoke.ArrowedLine(img, bottom_middle_line.P1, bottom_middle_line.P2, new Bgr(Color.White).MCvScalar, 1);
+            }
+            if (bottom_right_lines.Count > 0)
+            {
+                bottom_right_line = getBigLine(bottom_right_lines);
+                CvInvoke.ArrowedLine(img, bottom_right_line.P1, bottom_right_line.P2, new Bgr(Color.White).MCvScalar, 1);
+            }
+
             ///CvInvoke.Imshow("3x3 Frames", img);
-            CvInvoke.Imwrite("C:\\Users\\Antivirus\\Desktop\\of\\Frames.png",img);
+            //CvInvoke.Imwrite("C:\\Users\\Antivirus\\Desktop\\of\\Frames.png",img);
+            CvInvoke.Imwrite("C:\\Users\\Antivirus\\Desktop\\of\\opticalflow" + (frameNumber - 1) + "-" + (frameNumber) + ".png", img);
             return img;
         }
 
-        public static Image<Hsv, byte> CalculateOpticalFlow(Image<Gray, byte> prevFrame, Image<Gray, byte> nextFrame, int frameNumber = 0) {
-            OpticalFlow of = new OpticalFlow();
-            Image<Hsv, byte> coloredMotion =  of.CalculateSections(nextFrame);
+        public  Image<Hsv, byte> CalculateOpticalFlow(Image<Gray, byte> prevFrame, Image<Gray, byte> nextFrame, int frameNumber = 0) {
+
+            Image<Hsv, byte> coloredMotion = new Image<Hsv, byte>(nextFrame.Width, nextFrame.Height);//CalculateSections(nextFrame);
 
             Image<Gray, float> velx = new Image<Gray, float>(new Size(prevFrame.Width, prevFrame.Height));
             Image<Gray, float> vely = new Image<Gray, float>(new Size(prevFrame.Width, prevFrame.Height));
@@ -120,20 +272,24 @@ namespace GaitRecognition
                     // Determine the intensity (i.e, the distance)
                     double intensity = Math.Sqrt(velxHere * velxHere + velyHere * velyHere) * 10;
                     Point p1 = new Point(i,j);
-                    Point p2 = OpticalFlow.ComputerSecondPoint(p1, degrees, intensity);
+                    Point p2 = ComputerSecondPoint(p1, degrees, intensity);
                     if (p1.X == p2.X && p1.Y == p2.Y) {
                         continue;
                     }
                     if (intensity < 15) { // if distance is smaller then ignore
                         continue;
                     }
-                    CvInvoke.Line(coloredMotion, p1, p2, new Bgr(Color.White).MCvScalar,1);
+                    this.all_lines.Add(new LineSegment2D(p1, p2));
+                    //CvInvoke.Line(coloredMotion, p1, p2, new Bgr(Color.White).MCvScalar,1);
                     //coloredMotion.Data[j, i, 2] = (intensity > 255) ? (byte)255 : (byte)intensity;
 
                     //fs.WriteLine(velxHere + "," + velyHere + "," + degrees + "," + intensity + "");
                 }
             }
-            CvInvoke.Imwrite("C:\\Users\\Antivirus\\Desktop\\of\\opticalflow" + (frameNumber - 1) + "-" + (frameNumber) + ".png", coloredMotion);
+
+            // calculate the 9 sections and add each line to the list of respective section
+           coloredMotion =  CalculateSections(coloredMotion, frameNumber);
+            //CvInvoke.Imwrite("C:\\Users\\Antivirus\\Desktop\\of\\opticalflow" + (frameNumber - 1) + "-" + (frameNumber) + ".png", coloredMotion);
             //fs.Flush();
             //fs.Close();
 
@@ -143,13 +299,33 @@ namespace GaitRecognition
             return coloredMotion;
         }
 
-        private static Point ComputerSecondPoint(Point p1, double theta, double distance) {
+        private  Point ComputerSecondPoint(Point p1, double theta, double distance) {
             Point p2 = new Point();
             p2.X = (int)Math.Round(p1.X + distance * Math.Cos(theta * Math.PI / 180.0));
             p2.Y = (int)Math.Round(p1.Y + distance * Math.Sin(theta * Math.PI / 180.0));
             //p2.X = (int)Math.Round(p1.X + distance * Math.Cos(theta));
             //p2.Y = (int)Math.Round(p1.Y + distance * Math.Sin(theta));
             return p2;
+        }
+
+        // get the line with maximum length
+        private LineSegment2D getBigLine(List<LineSegment2D> lines)
+        {
+            if (lines.Count == 0)
+                return new LineSegment2D();
+
+            LineSegment2D bigLine = new LineSegment2D();
+            bigLine = lines[0];
+
+            foreach (LineSegment2D line in lines)
+            {
+                if (bigLine.Length < line.Length)
+                {
+                    bigLine = line;
+                }
+            }
+
+            return bigLine;
         }
     }
     
