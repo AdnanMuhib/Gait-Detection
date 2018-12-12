@@ -512,7 +512,7 @@ namespace GaitRecognition
                         }
                         catch (Exception ex)
                         {
-                            //MessageBox.Show(ex.Message);
+                            Console.WriteLine(ex.Message);
                             Application.Idle -= _capture_ImageGrabbed;
                             _capture.Pause();
                             _capture.Stop();

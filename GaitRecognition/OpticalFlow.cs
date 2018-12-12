@@ -55,6 +55,7 @@ namespace GaitRecognition
         LineSegment2D bottom_right_line;
 
         List<LineSegment2D> all_lines;
+        // Constructor
         public OpticalFlow() {
             top_left = new Rectangle();
             top_middle = new Rectangle();
@@ -95,6 +96,7 @@ namespace GaitRecognition
             all_lines = new List<LineSegment2D>();
         }
 
+        // Calculate Sections, Assign Lines for Each Section and Draw on Image
         public  Image<Hsv, byte> CalculateSections(Image<Hsv, byte> frameImg, int frameNumber = 0) {
             // resultant Image
             Image<Hsv, byte> img = new Image<Hsv, byte>(frameImg.Width, frameImg.Height);
@@ -236,10 +238,11 @@ namespace GaitRecognition
 
             ///CvInvoke.Imshow("3x3 Frames", img);
             //CvInvoke.Imwrite("C:\\Users\\Antivirus\\Desktop\\of\\Frames.png",img);
-            CvInvoke.Imwrite("C:\\Users\\Antivirus\\Desktop\\of\\opticalflow" + (frameNumber - 1) + "-" + (frameNumber) + ".png", img);
+            //CvInvoke.Imwrite("C:\\Users\\Antivirus\\Desktop\\of\\opticalflow" + (frameNumber - 1) + "-" + (frameNumber) + ".png", img);
             return img;
         }
 
+        // Calculate Optical Flow Using Farne back Algorithm
         public  Image<Hsv, byte> CalculateOpticalFlow(Image<Gray, byte> prevFrame, Image<Gray, byte> nextFrame, int frameNumber = 0) {
 
             Image<Hsv, byte> coloredMotion = new Image<Hsv, byte>(nextFrame.Width, nextFrame.Height);//CalculateSections(nextFrame);
@@ -247,14 +250,8 @@ namespace GaitRecognition
             Image<Gray, float> velx = new Image<Gray, float>(new Size(prevFrame.Width, prevFrame.Height));
             Image<Gray, float> vely = new Image<Gray, float>(new Size(prevFrame.Width, prevFrame.Height));
 
-            //GFTTDetector featureDetector = new GFTTDetector(10, 0.01, 10, 3);
-            //MKeyPoint[] featurePoints = featureDetector.Detect(prevFrame);
-            //MKeyPoint[] fp2;
-            //CvInvoke.CalcOpticalFlowPyrLK(prevFrame,nextFrame, featurePoints, fp2,);
-
             CvInvoke.CalcOpticalFlowFarneback(prevFrame, nextFrame, velx, vely, 0.5, 3, 60, 3, 5, 1.1, OpticalflowFarnebackFlag.Default);
-            //Image<Hsv, Byte> coloredMotion = new Image<Hsv, Byte>(new Size(prevFrame.Width, prevFrame.Height));
-            
+            prevFrame.Dispose();
             
             //StreamWriter fs = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\opticalflow" + (frameNumber -1) + "-" + (frameNumber) + ".csv");
             //fs.WriteLine("velx," + "vely," + "degrees," + "distance");
@@ -283,7 +280,7 @@ namespace GaitRecognition
                     if (p1.X == p2.X && p1.Y == p2.Y) {
                         continue;
                     }
-                    if (intensity < 15) { // if distance is smaller then ignore
+                    if (intensity < 1) { // if distance is smaller then ignore
                         continue;
                     }
                     this.all_lines.Add(new LineSegment2D(p1, p2));
@@ -305,6 +302,8 @@ namespace GaitRecognition
             //CvInvoke.Imshow("Lightness Motion", coloredMotion);
             return coloredMotion;
         }
+
+        // Calculate Optical Flow Using PyrLk Algorithm
         public void PyrLkOpticalFlow(Image<Gray, byte> prevFrame, Image<Gray, byte> nextFrame)
         {
 
@@ -330,6 +329,7 @@ namespace GaitRecognition
                 }
          }
 
+        // Compute the Second Point for Line given first Point, Angle and Distance
         private  Point ComputerSecondPoint(Point p1, double theta, double distance) {
             Point p2 = new Point();
             p2.X = (int)Math.Round(p1.X + distance * Math.Cos(theta * Math.PI / 180.0));
@@ -357,6 +357,25 @@ namespace GaitRecognition
             }
 
             return bigLine;
+        }
+
+        public void Dispose()
+        {
+            all_lines.Clear();
+
+            top_left_lines.Clear();
+            top_middle_lines.Clear();
+            top_right_lines.Clear();
+
+            middle_left_lines.Clear();
+            middle_middle_lines.Clear();
+            middle_right_lines.Clear();
+
+            bottom_left_lines.Clear();
+            bottom_middle_lines.Clear();
+            bottom_right_lines.Clear();
+
+            System.GC.SuppressFinalize(this);
         }
     }
     

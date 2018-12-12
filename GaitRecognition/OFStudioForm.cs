@@ -22,8 +22,8 @@ namespace GaitRecognition
         int frameSkip;
         int frameCounter;
 
-        Image<Gray, byte> grayImage;
-        Image<Bgr, byte> BgrImage;
+        //Image<Gray, byte> grayImage;
+        //Image<Bgr, byte> BgrImage;
         Image<Gray, byte> prevFrame;
         Image<Gray, byte> nextFrame;
         OpticalFlow _opticalflow;
@@ -34,7 +34,7 @@ namespace GaitRecognition
             // make a list of connected cameras to the computer
             List<String> cameras = new List<string>();
             videoPath = "";
-            frameSkip = 5;
+            frameSkip = 20;
             frameCounter = 0;
             
             DsDevice[] _SystemCameras = DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);
@@ -52,8 +52,6 @@ namespace GaitRecognition
             
             // show the list of cameras in the drop down list
             comboBoxCameraList.DataSource = cameras;
-
-            _opticalflow = new OpticalFlow();
         }
 
         Mat _frame = new Mat();
@@ -70,17 +68,25 @@ namespace GaitRecognition
                     if (_capture != null)
                     {
                         if (frameCounter == 1) {
-                            prevFrame =  _capture.QueryFrame().ToImage<Gray, byte>().Resize(200, 200, Emgu.CV.CvEnum.Inter.Area);
+                            prevFrame =  _capture.QueryFrame().ToImage<Gray, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Area);
                         }
-                        else if (frameCounter % frameSkip == 0) { // use only the frames after skipped frames
-                            //BgrImage = _capture.QueryFrame().ToImage<Bgr, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Area);
-                            //pictureViewBox.Image = BgrImage;
-                            nextFrame = _capture.QueryFrame().ToImage<Gray, byte>().Resize(200, 200, Emgu.CV.CvEnum.Inter.Area);
-                           // opticalViewBox.Image = _opticalflow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter);
-                            _opticalflow.PyrLkOpticalFlow(prevFrame, nextFrame);
-                            //pictureViewBox.Image = nextFrame;
+                        else {// if (frameCounter % frameSkip == 0) { // use only the frames after skipped frames
+                              //BgrImage = _capture.QueryFrame().ToImage<Bgr, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Area);
+                              //pictureViewBox.Image = BgrImage;
+                            for (int i = 0; i < frameSkip; i++) {
+                                _capture.Grab(); // skip the number of frames
+                            }
+                            _opticalflow = new OpticalFlow();
+                            nextFrame = _capture.QueryFrame().ToImage<Gray, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Area);
+                            Image<Hsv, byte> outputImg  = _opticalflow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter);
+                            opticalViewBox.Image = outputImg;
+                            outputImg.Dispose();
+                            //_opticalflow.PyrLkOpticalFlow(prevFrame, nextFrame);
+                            prevFrame.Dispose();
+                            pictureViewBox.Image = nextFrame;
                             prevFrame = nextFrame.Clone();
                             nextFrame.Dispose();
+                            
                         }
                     }
 
@@ -101,6 +107,7 @@ namespace GaitRecognition
                     btnPlayPause.BackgroundImage = Properties.Resources.play36;
                 }
             }
+
             // Handle Every Frame if Camera is On
             if (radioButtonCamera.Checked)
             {
@@ -112,14 +119,15 @@ namespace GaitRecognition
                         if (frameCounter == 1)
                         {
                             _capture.Retrieve(_frame, 0);
-                            prevFrame = _frame.ToImage<Gray, byte>().Resize(200, 200, Emgu.CV.CvEnum.Inter.Cubic);
+                            prevFrame = _frame.ToImage<Gray, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Cubic);
                         }
-                        else if (frameCounter % frameSkip == 0) { // use only the frames after skipped frames
+                        else {// if (frameCounter % frameSkip == 0) { // use only the frames after skipped frames
                             _capture.Retrieve(_frame, 0);
-                            //pictureViewBox.Image = _frame.ToImage<Bgr, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Cubic);
-                            nextFrame = _frame.ToImage<Gray, byte>().Resize(200, 200, Emgu.CV.CvEnum.Inter.Cubic);
-                            pictureViewBox.Image = nextFrame;
+                            nextFrame = _frame.ToImage<Gray, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Cubic);
+                            _opticalflow = new OpticalFlow();
                             opticalViewBox.Image =  _opticalflow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter);
+                            pictureViewBox.Image = nextFrame;
+                            prevFrame.Dispose();
                             prevFrame = nextFrame.Clone();
                             nextFrame.Dispose();
                         }
@@ -179,7 +187,7 @@ namespace GaitRecognition
                 else if (!isPlaying && _capture == null) // check if camera is not or it's first time for camera
                 {
                     _capture = new VideoCapture();
-                    _capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Settings, 1);
+                    //_capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.PosFrames, frameSkip);
                     _capture.ImageGrabbed += imageFrameCaptured;
                     _capture.Start();
                     isPlaying = true;
@@ -210,8 +218,8 @@ namespace GaitRecognition
                 {
                     if (_capture == null) { // if playing first time
                         _capture = new VideoCapture(videoPath);
+                        //_capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.PosFrames, frameSkip);
                     }
-                    //_capture.ImageGrabbed += imageFrameCaptured;
                     Application.Idle += imageFrameCaptured;
                     btnPlayPause.BackgroundImage = Properties.Resources.pause36;
                     isPlaying = true;
@@ -245,6 +253,7 @@ namespace GaitRecognition
         private void numericFrameSkip_ValueChanged(object sender, EventArgs e)
         {
             frameSkip = (int)numericFrameSkip.Value;
+            //_capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.PosFrames, frameSkip);
         }
     }
 }
