@@ -55,7 +55,7 @@ namespace GaitRecognition
             BgrImg = new Image<Bgr, byte>(inputFolder + filename).Resize(400, 400, Inter.Cubic);
 
             //removebackground(filename);
-            //MLP mlp = new MLP();
+            MLP mlp = new MLP();
             // batchProcessor();
         }
 
@@ -134,15 +134,23 @@ namespace GaitRecognition
 
         // Background Subtraction From the Given Background and Input Image
         public void removebackground(string filepath = null) {
+            CvInvoke.Imshow("1- Background Image", bgImage);
+            CvInvoke.Imshow("2- Forground Image", img);
             Image<Gray, byte> output = new Image<Gray, byte>(bgImage.Width, bgImage.Height);
             BackgroundSubtractorMOG2 bgsubtractor = new BackgroundSubtractorMOG2(varThreshold:100,shadowDetection:false);
             bgsubtractor.Apply(bgImage, output);
             bgsubtractor.Apply(img, output);
             pictureViewBox.Image = output;
+
+            CvInvoke.Imshow("3- Background Subtracted", output);
             //output.Canny(100,100);
 
             CvInvoke.Erode(output, output, null, new System.Drawing.Point(-1, -1), 1, BorderType.Reflect, default(MCvScalar));
+
+            CvInvoke.Imshow("4- After Applying Erode", output);
             CvInvoke.Dilate(output, output, null, new System.Drawing.Point(-1, -1), 5, BorderType.Reflect, default(MCvScalar));
+
+            CvInvoke.Imshow("5- After Dilation", output);
 
             // Write the Silhoutte output to the file
             if (filepath != null && saveResults == true)
@@ -158,7 +166,7 @@ namespace GaitRecognition
             Image<Gray, byte> thinOutput = new Image<Gray, byte>(output.Width, output.Height);
             XImgprocInvoke.Thinning(output, thinOutput, ThinningTypes.ZhangSuen);
             pictureViewBox.Image = thinOutput.Not().Not();
-
+            CvInvoke.Imshow("6- After Thinning Zhang Suen", thinOutput);
             // Write the thinned Image to the file
             if (filepath != null && saveResults == true)
             {
@@ -167,8 +175,8 @@ namespace GaitRecognition
             }
             
             // drawing bounding Box of the person
-            //CvInvoke.Rectangle(thinOutput, rec, new Rgb(Color.White).MCvScalar, 2);
-
+            CvInvoke.Rectangle(thinOutput, rec, new Rgb(Color.White).MCvScalar, 2);
+            CvInvoke.Imshow("Person Bounding Box", thinOutput);
             // drawing the middle line of the Person
             //CvInvoke.Line(thinOutput, frm.middle_line.p1, frm.middle_line.p2, new Rgb(Color.White).MCvScalar, 2);
 
@@ -214,7 +222,7 @@ namespace GaitRecognition
                     CvInvoke.Line(lineImage, line.P1, line.P2, new Bgr(Color.Green).MCvScalar, 1);
                 }
             }
-
+            CvInvoke.Imshow("7- Hough Lines", lineImage);
             // get a list of lines using Line class
 
             List<Line> lstLine = Line.ConvertToList(lines);
@@ -269,7 +277,7 @@ namespace GaitRecognition
             CvInvoke.Imwrite(outputFolder + "Seperated Line" + filePath, OneLineImage);
 
             // displaying the image
-            CvInvoke.Imshow("Seperated Lines", OneLineImage);
+            CvInvoke.Imshow("8- Top Bottom Seperated Lines", OneLineImage);
 
             // getting the top left right lines 
             List<Line> topLeftLines = Line.GetLeftRightLines(topLines)[0];
@@ -285,34 +293,36 @@ namespace GaitRecognition
 
             // drawing top left lines 
             foreach (Line line in topLeftLines) {
-                //CvInvoke.Line(leftRightLineImage, line.p1, line.p2, new Rgb(Color.Blue).MCvScalar, 1);
+                CvInvoke.Line(leftRightLineImage, line.p1, line.p2, new Rgb(Color.Blue).MCvScalar, 1);
             }
 
             // drawing top right lines 
             foreach (Line line in topRightLines)
             {
-                //CvInvoke.Line(leftRightLineImage, line.p1, line.p2, new Rgb(Color.Red).MCvScalar, 1);
+                CvInvoke.Line(leftRightLineImage, line.p1, line.p2, new Rgb(Color.Red).MCvScalar, 1);
             }
             // drawing bottom left lines 
             foreach (Line line in bottomLeftLines)
             {
-                //CvInvoke.Line(leftRightLineImage, line.p1, line.p2, new Rgb(Color.Blue).MCvScalar, 1);
+                CvInvoke.Line(leftRightLineImage, line.p1, line.p2, new Rgb(Color.Blue).MCvScalar, 1);
             }
 
             // drawing bottom right lines 
             foreach (Line line in bottomRightLines)
             {
-                //CvInvoke.Line(leftRightLineImage, line.p1, line.p2, new Rgb(Color.Red).MCvScalar, 1);
+                CvInvoke.Line(leftRightLineImage, line.p1, line.p2, new Rgb(Color.Red).MCvScalar, 1);
             }
 
+            CvInvoke.Imshow("9- Left Right Seperated Lines", leftRightLineImage);
 
-
+            Mat leftRightSingleLineImage = new Mat(ThinImage.Size, DepthType.Cv8U, 3);
+            leftRightSingleLineImage.SetTo(new MCvScalar(0));
             // Get the Big Line from top right Lines
             Line TopRightLine = Line.getBigLine(topRightLines);
 
             if (TopRightLine != null)
             {
-                CvInvoke.Line(leftRightLineImage, TopRightLine.p1, TopRightLine.p2, new Bgr(Color.Red).MCvScalar, 1);
+                CvInvoke.Line(leftRightSingleLineImage, TopRightLine.p1, TopRightLine.p2, new Bgr(Color.Red).MCvScalar, 1);
             }
 
             // Get the Big Line from top left Lines
@@ -320,7 +330,7 @@ namespace GaitRecognition
 
             if (TopLeftLine != null)
             {
-                CvInvoke.Line(leftRightLineImage, TopLeftLine.p1, TopLeftLine.p2, new Bgr(Color.Blue).MCvScalar, 1);
+                CvInvoke.Line(leftRightSingleLineImage, TopLeftLine.p1, TopLeftLine.p2, new Bgr(Color.Blue).MCvScalar, 1);
             }
 
             // Get the Big Line from bottom right Lines
@@ -328,7 +338,7 @@ namespace GaitRecognition
 
             if (BottomRightLine != null)
             {
-                CvInvoke.Line(leftRightLineImage, BottomRightLine.p1, BottomRightLine.p2, new Bgr(Color.Red).MCvScalar, 1);
+                CvInvoke.Line(leftRightSingleLineImage, BottomRightLine.p1, BottomRightLine.p2, new Bgr(Color.Red).MCvScalar, 1);
             }
 
             // Get the Big Line from bottom left Lines
@@ -336,28 +346,29 @@ namespace GaitRecognition
 
             if (BottomLeftLine != null)
             {
-                CvInvoke.Line(leftRightLineImage, BottomLeftLine.p1, BottomLeftLine.p2, new Bgr(Color.Blue).MCvScalar, 1);
+                CvInvoke.Line(leftRightSingleLineImage, BottomLeftLine.p1, BottomLeftLine.p2, new Bgr(Color.Blue).MCvScalar, 1);
             }
 
             // Get the Big Line from Common Lines
             Line bigCommonLine = Line.getBigLine(commonLines);
 
             if (bigCommonLine != null) {
-                CvInvoke.Line(leftRightLineImage, bigCommonLine.p1, bigCommonLine.p2, new Rgb(Color.White).MCvScalar, 1);
+                CvInvoke.Line(leftRightSingleLineImage, bigCommonLine.p1, bigCommonLine.p2, new Rgb(Color.White).MCvScalar, 1);
             }
+            CvInvoke.Imshow("10- Single Big Line", leftRightSingleLineImage);
 
+            Mat FeaturePointsImage = new Mat(ThinImage.Size, DepthType.Cv8U, 3);
+            FeaturePointsImage.SetTo(new MCvScalar(0));
             // Extract Feature Points from the Lines
             List<FeaturePoint> featurePoints = Feature.ExtractFeaturePoints(bigCommonLine, BottomLeftLine, BottomRightLine, TopLeftLine, TopRightLine);
             
-
+            
             // Draw Feature Points on The Picture
 
             foreach (FeaturePoint fp in featurePoints) {
                 CvInvoke.Circle(leftRightLineImage, fp.point, 5, new Bgr(Color.Green).MCvScalar, 2, LineType.EightConnected);
                 CvInvoke.PutText(leftRightLineImage, fp.name,fp.point, FontFace.HersheyPlain, 1, new Bgr(Color.White).MCvScalar);
             }
-
-            // draw big common line
 
             CvInvoke.PutText(leftRightLineImage, "Left Lines(Negative Slope)", new Point(10, 30), FontFace.HersheyPlain, 1, new Rgb(Color.Blue).MCvScalar, 1);
             CvInvoke.PutText(leftRightLineImage, "Right Lines(Positive Slope)", new Point(10, 50), FontFace.HersheyPlain, 1, new Rgb(Color.Red).MCvScalar, 1);
@@ -367,7 +378,7 @@ namespace GaitRecognition
             {
                 CvInvoke.Imwrite(outputFolder + "Left_Right_" + filePath, leftRightLineImage);
             }
-            CvInvoke.Imshow("LEFT RIGHT LINED", leftRightLineImage);
+            CvInvoke.Imshow("11- Feature Points Image", leftRightLineImage);
             leftRightLineImage.Dispose();
             // drawing bounding Box of the person
             //CvInvoke.Rectangle(lineImage, frm.rec, new Rgb(Color.White).MCvScalar, 2);

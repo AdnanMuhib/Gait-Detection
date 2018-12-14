@@ -152,6 +152,7 @@ namespace GaitRecognition
                 else if (line.P1.X < w && line.P2.X < w && line.P1.Y < section_height && line.P2.Y < section_height) {
                     top_right_lines.Add(line);
                 }
+
                 // middle row sections
                 else if (line.P1.X < section_width && line.P2.X < section_width && line.P1.Y < 2* section_height && line.P2.Y < 2* section_height)
                 {
@@ -165,18 +166,19 @@ namespace GaitRecognition
                 {
                     middle_right_lines.Add(line);
                 }
+
                 // third row sections
                 else if (line.P1.X < section_width && line.P2.X < section_width && line.P1.Y < h && line.P2.Y < h)
                 {
-                    top_left_lines.Add(line);
+                    bottom_left_lines.Add(line);
                 }
                 else if (line.P1.X < 2 * section_width && line.P2.X < 2 * section_width && line.P1.Y < h && line.P2.Y < h)
                 {
-                    top_middle_lines.Add(line);
+                    bottom_middle_lines.Add(line);
                 }
                 else if (line.P1.X < w && line.P2.X < w && line.P1.Y < h && line.P2.Y < h)
                 {
-                    top_right_lines.Add(line);
+                    bottom_right_lines.Add(line);
                 }
             }
 
@@ -253,8 +255,8 @@ namespace GaitRecognition
             CvInvoke.CalcOpticalFlowFarneback(prevFrame, nextFrame, velx, vely, 0.5, 3, 60, 3, 5, 1.1, OpticalflowFarnebackFlag.Default);
             prevFrame.Dispose();
             
-            //StreamWriter fs = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\opticalflow" + (frameNumber -1) + "-" + (frameNumber) + ".csv");
-            //fs.WriteLine("velx," + "vely," + "degrees," + "distance");
+            StreamWriter fs = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\opticalflow" + (frameNumber -1) + "-" + (frameNumber) + ".csv");
+            fs.WriteLine("velx," + "vely," + "degrees," + "distance");
 
             for (int i = 0; i < coloredMotion.Width; i++)
             {
@@ -280,22 +282,22 @@ namespace GaitRecognition
                     if (p1.X == p2.X && p1.Y == p2.Y) {
                         continue;
                     }
-                    if (intensity < 1) { // if distance is smaller then ignore
+                    if (intensity < 10) { // if distance is smaller then ignore
                         continue;
                     }
                     this.all_lines.Add(new LineSegment2D(p1, p2));
                     //CvInvoke.Line(coloredMotion, p1, p2, new Bgr(Color.White).MCvScalar,1);
                     //coloredMotion.Data[j, i, 2] = (intensity > 255) ? (byte)255 : (byte)intensity;
 
-                    //fs.WriteLine(velxHere + "," + velyHere + "," + degrees + "," + intensity + "");
+                    fs.WriteLine(velxHere + "," + velyHere + "," + degrees + "," + intensity + "");
                 }
             }
 
             // calculate the 9 sections and add each line to the list of respective section
            coloredMotion =  CalculateSections(coloredMotion, frameNumber);
             //CvInvoke.Imwrite("C:\\Users\\Antivirus\\Desktop\\of\\opticalflow" + (frameNumber - 1) + "-" + (frameNumber) + ".png", coloredMotion);
-            //fs.Flush();
-            //fs.Close();
+            fs.Flush();
+            fs.Close();
 
             // coloredMotion is now an image that shows intensity of motion by lightness
             // and direction by color.
