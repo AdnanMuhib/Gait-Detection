@@ -15,13 +15,14 @@ using Emgu.CV.XImgproc;
 using System.Windows.Forms;
 using System.Drawing.Imaging;
 using Emgu.CV.Util;
+using System.Drawing.Drawing2D;
 
 namespace GaitRecognition
 {
     public partial class GaitRecognition : Form
     {
         // input and output directories for batch Processing
-        String inputFolder = @"D:\UNIVERSITY DOCUMENTS\FYP\Human Activity Recognition\KTH Dataset\Gait Pics\Ahmad\ahmad5\";
+        String inputFolder = @"C:\Users\Antivirus\Desktop\APS Products Images\";
         String outputFolder = @"D:\UNIVERSITY DOCUMENTS\FYP\Human Activity Recognition\Test Outputs\";
 
         
@@ -50,12 +51,12 @@ namespace GaitRecognition
             frameIndex = 0;
             //pictureViewBox.SizeMode = PictureBoxSizeMode.Zoom;
             string filename = "20.bmp";
-            bgImage = new Image<Gray, byte>(inputFolder + "b.bmp").Resize(400,400,Inter.Cubic);
-            img = new Image<Gray, byte>(inputFolder + filename).Resize(400, 400, Inter.Cubic);
-            BgrImg = new Image<Bgr, byte>(inputFolder + filename).Resize(400, 400, Inter.Cubic);
+            //bgImage = new Image<Gray, byte>(inputFolder + "b.bmp").Resize(400,400,Inter.Cubic);
+            //img = new Image<Gray, byte>(inputFolder + filename).Resize(400, 400, Inter.Cubic);
+            //BgrImg = new Image<Bgr, byte>(inputFolder + filename).Resize(400, 400, Inter.Cubic);
 
             //removebackground(filename);
-            MLP mlp = new MLP();
+            //MLP mlp = new MLP();
             // batchProcessor();
         }
 
@@ -112,7 +113,7 @@ namespace GaitRecognition
             List<String> files = new List<string>();
             DirectoryInfo d = new DirectoryInfo(inputFolder);
 
-            FileInfo[] Files = d.GetFiles("*.bmp"); //Getting BMP files
+            FileInfo[] Files = d.GetFiles("*.png"); //Getting BMP files
             foreach (FileInfo file in Files) {
                 if (file.Name.Equals("b.bmp"))
                 {
@@ -124,9 +125,11 @@ namespace GaitRecognition
             }
 
             foreach (String imgName in files) {
-                img = new Image<Gray, byte>(inputFolder +  imgName).Resize(400, 400, Inter.Cubic);
-                BgrImg = new Image<Bgr, byte>(inputFolder + imgName).Resize(400, 400, Inter.Cubic);
-                removebackground("_out_" + imgName);
+                img = new Image<Gray, byte>(inputFolder + imgName);//.Resize(400, 400, Inter.Cubic);
+                //BgrImg = new Image<Bgr, byte>(inputFolder + imgName).Resize(400, 400, Inter.Cubic);
+                //removebackground("_out_" + imgName);
+                resizeImage(inputFolder, imgName, 600, 600, img.Width, img.Height);
+                img.Dispose();
             }
             this.Close();
             return;
@@ -470,6 +473,56 @@ namespace GaitRecognition
             //********************************************************************************
         }
 
+        private void resizeImage(string path, string originalFilename,
+                     /* note changed names */
+                     int canvasWidth, int canvasHeight,
+                     /* new */
+                     int originalWidth, int originalHeight)
+        {
+            Image image = Image.FromFile(path + originalFilename);
+
+            System.Drawing.Image thumbnail =
+                new Bitmap(canvasWidth, canvasHeight, PixelFormat.Format32bppArgb); // changed parm names
+            System.Drawing.Graphics graphic =
+                         System.Drawing.Graphics.FromImage(thumbnail);
+            //graphic.Clear(Color.Transparent);
+
+            graphic.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            graphic.SmoothingMode = SmoothingMode.HighQuality;
+            graphic.PixelOffsetMode = PixelOffsetMode.HighQuality;
+            graphic.CompositingQuality = CompositingQuality.HighQuality;
+
+            /* ------------------ new code --------------- */
+
+            // Figure out the ratio
+            double ratioX = (double)canvasWidth / (double)originalWidth;
+            double ratioY = (double)canvasHeight / (double)originalHeight;
+            // use whichever multiplier is smaller
+            double ratio = ratioX < ratioY ? ratioX : ratioY;
+
+            // now we can get the new height and width
+            int newHeight = Convert.ToInt32(originalHeight * ratio);
+            int newWidth = Convert.ToInt32(originalWidth * ratio);
+
+            // Now calculate the X,Y position of the upper-left corner 
+            // (one of these will always be zero)
+            int posX = Convert.ToInt32((canvasWidth - (originalWidth * ratio)) / 2);
+            int posY = Convert.ToInt32((canvasHeight - (originalHeight * ratio)) / 2);
+
+            graphic.Clear(Color.Black); // white padding
+            graphic.DrawImage(image, posX, posY, newWidth, newHeight);
+
+            /* ------------- end new code ---------------- */
+
+            System.Drawing.Imaging.ImageCodecInfo[] info =
+                             ImageCodecInfo.GetImageEncoders();
+            EncoderParameters encoderParameters;
+            encoderParameters = new EncoderParameters(1);
+            encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality,
+                             100L);
+            thumbnail.Save(path + "/Output/" + originalFilename, info[1],
+                             encoderParameters);
+        }
         // Open the Video File
         private void openVideoToolStripMenuItem_Click(object sender, EventArgs e)
         {
