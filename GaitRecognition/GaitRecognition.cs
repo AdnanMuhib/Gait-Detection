@@ -58,6 +58,7 @@ namespace GaitRecognition
             //removebackground(filename);
             MLP mlp = new MLP();
             mlp.LoadCSVData(@"C:\Users\Antivirus\Desktop\of\opticalflow1-2.csv");
+            mlp.Train();
             // batchProcessor();
         }
 
