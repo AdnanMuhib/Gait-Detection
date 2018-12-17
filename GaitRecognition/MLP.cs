@@ -35,24 +35,36 @@ namespace GaitRecognition
         // Load Complete Dataset
         public void LoadCSVData(String csvFilePath) {
             var data = File.ReadLines(csvFilePath).Select(x => x.Split(',')).ToArray();
-            int count = 0;
-            int rowcount = data.Length;
+
+            int rowcount = data.Length; 
             int columnCount = data[0].Length;
-            trainData = new Matrix<float>(rowcount - 1, columnCount);
+
+            // create matrix for Train Data
+            trainData = new Matrix<float>(rowcount - 1, columnCount - 1);
+
+            // create matrix for train classes 
+            trainClasses = new Matrix<float>(rowcount - 1, 1);
+
             try
             {
                 for (int i = 1; i < rowcount - 1; i++)
                 {
                     for (int j = 0; j < columnCount; j++)
                     {
-                        trainData[i, j] = float.Parse(data[i][j]);
+                        // last column as class label and store in training classes
+                        if (j != columnCount - 1) {
+                            trainData[i, j] = float.Parse(data[i][j]);
+                        }
+                        else 
+                        {
+                            trainClasses[i, 0] = float.Parse(data[i][j]);
+                        }
                     }
                 }
             }
             catch (Exception e) {
                 Console.WriteLine("Error: " + e.Message);
             }
-            
         }
 
         // Load only Training Dataset
