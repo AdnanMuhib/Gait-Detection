@@ -56,7 +56,8 @@ namespace GaitRecognition
             //BgrImg = new Image<Bgr, byte>(inputFolder + filename).Resize(400, 400, Inter.Cubic);
 
             //removebackground(filename);
-            //MLP mlp = new MLP();
+            MLP mlp = new MLP();
+            mlp.LoadCSVData(@"C:\Users\Antivirus\Desktop\of\opticalflow1-2.csv");
             // batchProcessor();
         }
 

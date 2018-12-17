@@ -13,7 +13,61 @@ namespace GaitRecognition
 {
     class MLP
     {
+        Matrix<float> trainData;
+        Matrix<float> trainClasses;
+        Matrix<float> testData;
+        Matrix<float> testLabels;
+        int InputLayers;
+        int OutputLayers;
+
+        float accuracy;
+        float precision;
+        float recall;
+        float epochs;
+
         public MLP() {
+            
+        }
+        // create the architecture of the Network
+        public void CreateNetwork(int[] layers_with_perceptrons) {
+
+        }
+        // Load Complete Dataset
+        public void LoadCSVData(String csvFilePath) {
+            var data = File.ReadLines(csvFilePath).Select(x => x.Split(',')).ToArray();
+            int count = 0;
+            int rowcount = data.Length;
+            int columnCount = data[0].Length;
+            trainData = new Matrix<float>(rowcount - 1, columnCount);
+            try
+            {
+                for (int i = 1; i < rowcount - 1; i++)
+                {
+                    for (int j = 0; j < columnCount; j++)
+                    {
+                        trainData[i, j] = float.Parse(data[i][j]);
+                    }
+                }
+            }
+            catch (Exception e) {
+                Console.WriteLine("Error: " + e.Message);
+            }
+            
+        }
+
+        // Load only Training Dataset
+        public void LoadCSVTrainData(String csvFilePath) {
+            var data = File.ReadLines(csvFilePath).Select(x => x.Split(',')).ToArray();
+        }
+
+        // Load only Testing Data
+        public void LoadCSVTestData(String csvFilePath)
+        {
+            var data = File.ReadLines(csvFilePath).Select(x => x.Split(',')).ToArray();
+        }
+        
+        // Begin the training of ANN_MLP
+        public void Train() {
             int trainSampleCount = 100;
 
             #region Generate the traning data and classes
@@ -83,6 +137,22 @@ namespace GaitRecognition
 
             Emgu.CV.UI.ImageViewer.Show(img);
         }
+
+        // Predict on Given Dataset
+        public void predict(String filePath) {
+
+        }
+
+        // Calculate and show the confusion matrix
+        public void ConfusionMatrix() {
+
+        }
+
+        // Evaluation of Given Test and Train set to compute the accuracy
+        public void Evaluate() {
+
+        }
+
     }
 
 }
