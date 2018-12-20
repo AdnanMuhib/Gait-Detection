@@ -25,7 +25,6 @@ namespace GaitRecognition
         String inputFolder = @"C:\Users\Antivirus\Desktop\APS Products Images\";
         String outputFolder = @"D:\UNIVERSITY DOCUMENTS\FYP\Human Activity Recognition\Test Outputs\";
 
-        
         Image<Bgr, byte> BgrImg; // Color Image
 
         Image<Gray, byte> img; // any input image
@@ -57,8 +56,10 @@ namespace GaitRecognition
 
             //removebackground(filename);
             MLP mlp = new MLP();
-            mlp.LoadCSVData(@"C:\Users\Antivirus\Desktop\of\opticalflow1-2.csv");
+            mlp.LoadTrainData(@"C:\Users\Antivirus\Desktop\of\train_data.csv");
             mlp.Train();
+            mlp.LoadTestData(@"C:\Users\Antivirus\Desktop\of\test_data.csv");
+            mlp.Predict();
             // batchProcessor();
         }
 
