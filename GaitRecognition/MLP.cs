@@ -116,15 +116,15 @@ namespace GaitRecognition
         public void Train() {
             int trainSampleCount = TrainSamples-1;
 
-            using (Matrix<int> layerSize = new Matrix<int>(new int[] { InputLayers, 10, 1 }))
+            using (Matrix<int> layerSize = new Matrix<int>(new int[] { InputLayers, 100, 1 }))
             using (Mat layerSizeMat = layerSize.Mat)
 
             using (TrainData td = new TrainData(trainData, Emgu.CV.ML.MlEnum.DataLayoutType.RowSample, trainClasses))
             {
                 nnet.SetLayerSizes(layerSizeMat);
-                nnet.SetActivationFunction(ANN_MLP.AnnMlpActivationFunction.SigmoidSym, 0, 0);
-                nnet.TermCriteria = new MCvTermCriteria(10, 1.0e-8);
-                nnet.SetTrainMethod(ANN_MLP.AnnMlpTrainMethod.Backprop, 0.1, 0.1);
+                nnet.SetActivationFunction(ANN_MLP.AnnMlpActivationFunction.SigmoidSym, 0.6, 1);
+                nnet.TermCriteria = new MCvTermCriteria(15, 1.0e-8);
+                nnet.SetTrainMethod(ANN_MLP.AnnMlpTrainMethod.Backprop, 0.1, 0);
                 try
                 {
                     nnet.Train(td, (int)Emgu.CV.ML.MlEnum.AnnMlpTrainingFlag.Default);
@@ -167,7 +167,7 @@ namespace GaitRecognition
                         sample[0, j] = testData[i, j];
                     }
                     nnet.Predict(sample, prediction);
-                    predictedClasses[i, 0] = (int)prediction.Data[0, 0];
+                    predictedClasses[i, 0] = GetCloseValue(prediction.Data[0, 0]);
 
                     if (predictedClasses[i, 0] == testClasses[i, 0])
                         tp = tp + 1;
@@ -181,7 +181,29 @@ namespace GaitRecognition
                 Console.WriteLine("Error occured Predicting..." + ex.Message);
             }
         }
-
+        // PostProcess the prediction
+        int GetCloseValue(double n)
+        {
+            n = n + 0.5;
+            n = Math.Floor(n);
+            if (n > 10) {
+                n = 10;
+            }
+            return (int)n;
+            /*int u = 0;
+            int a = (int)n;
+            if ((n - a) < 0.5)
+            {
+                u = a;
+            }
+            else {
+                u = a + 1;
+            }
+            if (u > 9) {
+                u = 10;
+            }
+            return u;*/
+        }
         // Calculate and show the confusion matrix
         public void ConfusionMatrix() {
 
@@ -193,5 +215,4 @@ namespace GaitRecognition
         }
 
     }
-
 }
