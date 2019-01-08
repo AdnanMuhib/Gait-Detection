@@ -68,7 +68,7 @@ namespace GaitRecognition
                     if (_capture != null)
                     {
                         if (frameCounter == 1) {
-                            prevFrame =  _capture.QueryFrame().ToImage<Gray, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Area);
+                            prevFrame =  _capture.QueryFrame().ToImage<Gray, byte>().Resize(200, 200, Emgu.CV.CvEnum.Inter.Area);
                         }
                         else {// if (frameCounter % frameSkip == 0) { // use only the frames after skipped frames
                               //BgrImage = _capture.QueryFrame().ToImage<Bgr, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Area);
@@ -77,7 +77,7 @@ namespace GaitRecognition
                                 _capture.Grab(); // skip the number of frames
                             }
                             _opticalflow = new OpticalFlow();
-                            nextFrame = _capture.QueryFrame().ToImage<Gray, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Area);
+                            nextFrame = _capture.QueryFrame().ToImage<Gray, byte>().Resize(200, 200, Emgu.CV.CvEnum.Inter.Area);
                             Image<Hsv, byte> outputImg  = _opticalflow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter);
                             opticalViewBox.Image = outputImg;
                             outputImg.Dispose();
