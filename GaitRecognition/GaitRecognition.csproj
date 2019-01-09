@@ -71,6 +71,7 @@
   <ItemGroup>
     <Compile Include="Feature.cs" />
     <Compile Include="FeaturePoint.cs" />
+    <Compile Include="FeatureVectorOpticalFlow.cs" />
     <Compile Include="GaitRecognition.cs">
       <SubType>Form</SubType>
     </Compile>

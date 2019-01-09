@@ -3,6 +3,7 @@ using Emgu.CV;
 using Emgu.CV.Ocl;
 using Emgu.CV.Structure;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -27,6 +28,7 @@ namespace GaitRecognition
         Image<Gray, byte> prevFrame;
         Image<Gray, byte> nextFrame;
         OpticalFlow _opticalflow;
+        String filename;
         public OFStudioForm()
         {
             
@@ -34,7 +36,7 @@ namespace GaitRecognition
             // make a list of connected cameras to the computer
             List<String> cameras = new List<string>();
             videoPath = "";
-            frameSkip = 20;
+            frameSkip = 3;
             frameCounter = 0;
             
             DsDevice[] _SystemCameras = DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);
@@ -76,7 +78,7 @@ namespace GaitRecognition
                             for (int i = 0; i < frameSkip; i++) {
                                 _capture.Grab(); // skip the number of frames
                             }
-                            _opticalflow = new OpticalFlow();
+                            _opticalflow = new OpticalFlow(filename, (int)ActivityClass.jogging);
                             nextFrame = _capture.QueryFrame().ToImage<Gray, byte>().Resize(200, 200, Emgu.CV.CvEnum.Inter.Area);
                             Image<Hsv, byte> outputImg  = _opticalflow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter);
                             opticalViewBox.Image = outputImg;
@@ -124,7 +126,7 @@ namespace GaitRecognition
                         else {// if (frameCounter % frameSkip == 0) { // use only the frames after skipped frames
                             _capture.Retrieve(_frame, 0);
                             nextFrame = _frame.ToImage<Gray, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Cubic);
-                            _opticalflow = new OpticalFlow();
+                            _opticalflow = new OpticalFlow("", (int)ActivityClass.walking);
                             opticalViewBox.Image =  _opticalflow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter);
                             pictureViewBox.Image = nextFrame;
                             prevFrame.Dispose();
@@ -244,6 +246,8 @@ namespace GaitRecognition
         private void btnBrowseVideo_Click(object sender, EventArgs e)
         {
             videoPath = GaitRecognition.openFileDialogue();
+            FileInfo fi = new FileInfo(videoPath);
+            filename = fi.Name.Split('.')[0];
             textBoxVideoPath.Text = videoPath;
             btnPlayPause.BackgroundImage = Properties.Resources.play36;
             isPlaying = false;

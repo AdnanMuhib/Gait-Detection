@@ -15,9 +15,11 @@ namespace GaitRecognition
 {
     class OpticalFlow
     {
-        // dividing the complete frame into 3x3 rectangles of equal size
 
-        
+        int class_label;
+        String fileName;
+        public static StreamWriter fs;
+        // dividing the complete frame into 3x3 rectangles of equal size
         Rectangle top_left;
         Rectangle top_middle;
         Rectangle top_right;
@@ -56,7 +58,21 @@ namespace GaitRecognition
 
         List<FeatureVectorOpticalFlow> all_lines;
         // Constructor
-        public OpticalFlow() {
+        public OpticalFlow(String filename, int label) {
+            fs = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\FeaturesFile.csv", append: true);
+            /*fs.WriteLine("velx_r1," + "vely_r1," + "degrees_r1," + "distance_r1,"
+                 + "velx_r2," + "vely_r2," + "degrees_r2," + "distance_r2,"
+                 + "velx_r3," + "vely_r3," + "degrees_r3," + "distance_r3,"
+                 + "velx_r4," + "vely_r4," + "degrees_r4," + "distance_r4,"
+                 + "velx_r5," + "vely_r5," + "degrees_r5," + "distance_r5,"
+                 + "velx_r6," + "vely_r6," + "degrees_r6," + "distance_r6,"
+                 + "velx_r7," + "vely_r7," + "degrees_r7," + "distance_r7,"
+                 + "velx_r8," + "vely_r8," + "degrees_r8," + "distance_r8,"
+                 + "velx_r9," + "vely_r9," + "degrees_r9," + "distance_r9,"
+                 + "activity");
+            fs.Close();*/
+            class_label = label;
+            fileName = filename;
             top_left = new Rectangle();
             top_middle = new Rectangle();
             top_right = new Rectangle();
@@ -259,13 +275,49 @@ namespace GaitRecognition
                 bottom_right_line = getBigLine(bottom_right_lines);
                 CvInvoke.ArrowedLine(img, bottom_right_line.line.P1, bottom_right_line.line.P2, new Bgr(Color.White).MCvScalar, 1);
             }
-
+            WriteFeatureToCSV();
             ///CvInvoke.Imshow("3x3 Frames", img);
             //CvInvoke.Imwrite("C:\\Users\\Antivirus\\Desktop\\of\\Frames.png",img);
             //CvInvoke.Imwrite("C:\\Users\\Antivirus\\Desktop\\of\\opticalflow" + (frameNumber - 1) + "-" + (frameNumber) + ".png", img);
             return img;
         }
 
+        // Write Feature Vector to CSV Format
+        public void WriteFeatureToCSV() {
+
+            fs.WriteLine(""+top_left_line.velx + "," + top_left_line.vely + "," + top_left_line.degrees + "," + top_left_line.distance + ","
+                + top_middle_line.velx + "," + top_middle_line.vely + "," + top_middle_line.degrees + "," + top_middle_line.distance + ","
+                + top_right_line.velx + "," + top_right_line.vely + "," + top_right_line.degrees + "," + top_right_line.distance + ","
+                + middle_left_line.velx + "," + middle_left_line.vely + "," + middle_left_line.degrees + "," + middle_left_line.distance + ","
+                + middle_middle_line.velx + "," + middle_middle_line.vely + "," + middle_middle_line.degrees + "," + middle_middle_line.distance + ","
+                + middle_right_line.velx + "," + middle_right_line.vely + "," + middle_right_line.degrees + "," + middle_right_line.distance + ","
+                + bottom_left_line.velx + "," + bottom_left_line.vely + "," + bottom_left_line.degrees + "," + bottom_left_line.distance + ","
+                + bottom_middle_line.velx + "," + bottom_middle_line.vely + "," + bottom_middle_line.degrees + "," + bottom_middle_line.distance + ","
+                + bottom_right_line.velx + "," + bottom_right_line.vely + "," + bottom_right_line.degrees + "," + bottom_right_line.distance + ","
+                + class_label);
+           StreamWriter streamWriter = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\" + fileName + ".csv",append:true);
+            /*streamWriter.WriteLine("velx_r1," + "vely_r1," + "degrees_r1," + "distance_r1,"
+                + "velx_r2," + "vely_r2," + "degrees_r2," + "distance_r2,"
+                + "velx_r3," + "vely_r3," + "degrees_r3," + "distance_r3,"
+                + "velx_r4," + "vely_r4," + "degrees_r4," + "distance_r4,"
+                + "velx_r5," + "vely_r5," + "degrees_r5," + "distance_r5,"
+                + "velx_r6," + "vely_r6," + "degrees_r6," + "distance_r6,"
+                + "velx_r7," + "vely_r7," + "degrees_r7," + "distance_r7,"
+                + "velx_r8," + "vely_r8," + "degrees_r8," + "distance_r8,"
+                + "velx_r9," + "vely_r9," + "degrees_r9," + "distance_r9,"
+                + "activity");*/
+            streamWriter.WriteLine(top_left_line.velx + "," + top_left_line.vely + "," + top_left_line.degrees + "," + top_left_line.distance + ","
+               + top_middle_line.velx + "," + top_middle_line.vely + "," + top_middle_line.degrees + "," + top_middle_line.distance + ","
+               + top_right_line.velx + "," + top_right_line.vely + "," + top_right_line.degrees + "," + top_right_line.distance + ","
+               + middle_left_line.velx + "," + middle_left_line.vely + "," + middle_left_line.degrees + "," + middle_left_line.distance + ","
+               + middle_middle_line.velx + "," + middle_middle_line.vely + "," + middle_middle_line.degrees + "," + middle_middle_line.distance + ","
+               + middle_right_line.velx + "," + middle_right_line.vely + "," + middle_right_line.degrees + "," + middle_right_line.distance + ","
+               + bottom_left_line.velx + "," + bottom_left_line.vely + "," + bottom_left_line.degrees + "," + bottom_left_line.distance + ","
+               + bottom_middle_line.velx + "," + bottom_middle_line.vely + "," + bottom_middle_line.degrees + "," + bottom_middle_line.distance + ","
+               + bottom_right_line.velx + "," + bottom_right_line.vely + "," + bottom_right_line.degrees + "," + bottom_right_line.distance + ","
+               + class_label);
+           streamWriter.Close();
+        }
         // Calculate Optical Flow Using Farne back Algorithm
         public  Image<Hsv, byte> CalculateOpticalFlow(Image<Gray, byte> prevFrame, Image<Gray, byte> nextFrame, int frameNumber = 0) {
 
@@ -276,10 +328,6 @@ namespace GaitRecognition
 
             CvInvoke.CalcOpticalFlowFarneback(prevFrame, nextFrame, velx, vely, 0.5, 3, 60, 3, 5, 1.1, OpticalflowFarnebackFlag.Default);
             prevFrame.Dispose();
-            
-            StreamWriter fs = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\opticalflow" + (frameNumber -1) + "-" + (frameNumber) + ".csv");
-            fs.WriteLine("velx," + "vely," + "degrees," + "distance");
-
             for (int i = 0; i < coloredMotion.Width; i++)
             {
                 for (int j = 0; j < coloredMotion.Height; j++)
@@ -307,11 +355,9 @@ namespace GaitRecognition
                     if (intensity < 10) { // if distance is smaller then ignore
                         continue;
                     }
-                    this.all_lines.Add(new FeatureVectorOpticalFlow(velxHere, velyHere, degrees, intensity, new LineSegment2D( p1, p2)));
+                    this.all_lines.Add(new FeatureVectorOpticalFlow(Math.Round(velxHere, 2), Math.Round(velyHere, 2), Math.Round(degrees, 2), Math.Round(intensity, 2), new LineSegment2D( p1, p2)));
                     //CvInvoke.Line(coloredMotion, p1, p2, new Bgr(Color.White).MCvScalar,1);
                     //coloredMotion.Data[j, i, 2] = (intensity > 255) ? (byte)255 : (byte)intensity;
-
-                    fs.WriteLine(velxHere + "," + velyHere + "," + degrees + "," + intensity + "");
                 }
             }
 
