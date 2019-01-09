@@ -56,9 +56,9 @@ namespace GaitRecognition
 
             //removebackground(filename);
             MLP mlp = new MLP();
-            mlp.LoadTrainData(@"C:\Users\Antivirus\Desktop\of\train_data.csv");
+            mlp.LoadTrainData(@"C:\Users\Antivirus\Desktop\of\Test_Shuffle_With_Col_Labels.csv");
             mlp.Train();
-            mlp.LoadTestData(@"C:\Users\Antivirus\Desktop\of\test_data.csv");
+            mlp.LoadTestData(@"C:\Users\Antivirus\Desktop\of\Test_Shuffle_With_Col_Labels.csv");
             mlp.Predict();
             // batchProcessor();
         }

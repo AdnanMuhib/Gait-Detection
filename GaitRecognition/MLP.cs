@@ -123,7 +123,7 @@ namespace GaitRecognition
             {
                 nnet.SetLayerSizes(layerSizeMat);
                 nnet.SetActivationFunction(ANN_MLP.AnnMlpActivationFunction.SigmoidSym, 0.6, 1);
-                nnet.TermCriteria = new MCvTermCriteria(15, 1.0e-8);
+                nnet.TermCriteria = new MCvTermCriteria(430, 1.0e-8);
                 nnet.SetTrainMethod(ANN_MLP.AnnMlpTrainMethod.Backprop, 0.1, 0);
                 try
                 {
@@ -186,8 +186,8 @@ namespace GaitRecognition
         {
             n = n + 0.5;
             n = Math.Floor(n);
-            if (n > 10) {
-                n = 10;
+            if (n > 2) {
+                n = 2;
             }
             return (int)n;
             /*int u = 0;
