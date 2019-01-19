@@ -18,7 +18,7 @@ namespace GaitRecognition
 
         int class_label;
         String fileName;
-        public static StreamWriter fs;
+        //public static StreamWriter fs;
         // dividing the complete frame into 3x3 rectangles of equal size
         Rectangle top_left;
         Rectangle top_middle;
@@ -59,7 +59,7 @@ namespace GaitRecognition
         List<FeatureVectorOpticalFlow> all_lines;
         // Constructor
         public OpticalFlow(String filename, int label) {
-            fs = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\FeaturesFile.csv", append: true);
+            //fs = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\FeaturesFile.csv", append: true);
             /*fs.WriteLine("velx_r1," + "vely_r1," + "degrees_r1," + "distance_r1,"
                  + "velx_r2," + "vely_r2," + "degrees_r2," + "distance_r2,"
                  + "velx_r3," + "vely_r3," + "degrees_r3," + "distance_r3,"
@@ -284,7 +284,7 @@ namespace GaitRecognition
 
         // Write Feature Vector to CSV Format
         public void WriteFeatureToCSV() {
-
+           StreamWriter fs = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\FeaturesFile.csv", append: true);
             fs.WriteLine(""+top_left_line.velx + "," + top_left_line.vely + "," + top_left_line.degrees + "," + top_left_line.distance + ","
                 + top_middle_line.velx + "," + top_middle_line.vely + "," + top_middle_line.degrees + "," + top_middle_line.distance + ","
                 + top_right_line.velx + "," + top_right_line.vely + "," + top_right_line.degrees + "," + top_right_line.distance + ","
@@ -295,6 +295,7 @@ namespace GaitRecognition
                 + bottom_middle_line.velx + "," + bottom_middle_line.vely + "," + bottom_middle_line.degrees + "," + bottom_middle_line.distance + ","
                 + bottom_right_line.velx + "," + bottom_right_line.vely + "," + bottom_right_line.degrees + "," + bottom_right_line.distance + ","
                 + class_label);
+            fs.Close();
            StreamWriter streamWriter = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\" + fileName + ".csv",append:true);
             /*streamWriter.WriteLine("velx_r1," + "vely_r1," + "degrees_r1," + "distance_r1,"
                 + "velx_r2," + "vely_r2," + "degrees_r2," + "distance_r2,"
@@ -352,7 +353,7 @@ namespace GaitRecognition
                     if (p1.X == p2.X && p1.Y == p2.Y) {
                         continue;
                     }
-                    if (intensity < 10) { // if distance is smaller then ignore
+                    if (intensity < 5) { // if distance is smaller then ignore
                         continue;
                     }
                     this.all_lines.Add(new FeatureVectorOpticalFlow(Math.Round(velxHere, 2), Math.Round(velyHere, 2), Math.Round(degrees, 2), Math.Round(intensity, 2), new LineSegment2D( p1, p2)));
@@ -364,8 +365,8 @@ namespace GaitRecognition
             // calculate the 9 sections and add each line to the list of respective section
            coloredMotion =  CalculateSections(coloredMotion, frameNumber);
             //CvInvoke.Imwrite("C:\\Users\\Antivirus\\Desktop\\of\\opticalflow" + (frameNumber - 1) + "-" + (frameNumber) + ".png", coloredMotion);
-            fs.Flush();
-            fs.Close();
+            //fs.Flush();
+            //fs.Close();
 
             // coloredMotion is now an image that shows intensity of motion by lightness
             // and direction by color.

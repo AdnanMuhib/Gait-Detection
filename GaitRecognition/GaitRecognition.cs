@@ -55,11 +55,12 @@ namespace GaitRecognition
             //BgrImg = new Image<Bgr, byte>(inputFolder + filename).Resize(400, 400, Inter.Cubic);
 
             //removebackground(filename);
+            /*
             MLP mlp = new MLP();
             mlp.LoadTrainData(@"C:\Users\Antivirus\Desktop\of\Test_Shuffle_With_Col_Labels.csv");
             mlp.Train();
             mlp.LoadTestData(@"C:\Users\Antivirus\Desktop\of\Test_Shuffle_With_Col_Labels.csv");
-            mlp.Predict();
+            mlp.Predict();*/
             // batchProcessor();
         }
 
@@ -557,7 +558,7 @@ namespace GaitRecognition
             {
                 if (frameIndex == 0)
                 {
-                    bgImage = _capture.QueryFrame().ToImage<Gray, byte>();
+                    bgImage = _capture.QueryFrame().ToImage<Gray, byte>().Resize(400,400,Inter.Cubic);
                     previousFrame = _capture.QueryFrame().ToImage<Gray, byte>();
                     //CvInvoke.Imwrite(outputFolder + "Frame_"+ frameIndex + ".bmp", bgImage);
                 }
@@ -570,12 +571,12 @@ namespace GaitRecognition
                         try
                         {
                             Image<Gray, byte> temp = img.Clone();
-                            img = _capture.QueryFrame().ToImage<Gray, byte>();
-                            nextFrame = _capture.QueryFrame().ToImage<Gray, byte>();
-                            BgrImg = _capture.QueryFrame().ToImage<Bgr, byte>();
+                            img = _capture.QueryFrame().ToImage<Gray, byte>().Resize(400, 400, Inter.Cubic);
+                            nextFrame = _capture.QueryFrame().ToImage<Gray, byte>().Resize(400, 400, Inter.Cubic);
+                            BgrImg = _capture.QueryFrame().ToImage<Bgr, byte>().Resize(400, 400, Inter.Cubic);
                             //CvInvoke.Imwrite(outputFolder + "Frame_" + frameIndex + ".bmp", img);
-                            //removebackground("Frame_" + frameIndex + ".bmp");
-                            OpticalFlow();
+                            removebackground("Frame_" + frameIndex + ".bmp");
+                            //OpticalFlow();
                         }
                         catch (Exception ex)
                         {
@@ -652,6 +653,69 @@ namespace GaitRecognition
             nextFrame.Dispose();
             coloredMotion.Dispose();
 
+        }
+
+        private void selectVideoFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            
+
+            using (var fbd = new FolderBrowserDialog())
+            {
+                fbd.RootFolder = Environment.SpecialFolder.MyComputer;
+                DialogResult result = fbd.ShowDialog();
+
+                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                {
+                    string[] files = Directory.GetFiles(fbd.SelectedPath);
+                    String location = Path.GetDirectoryName(files[0]);
+                    String outputFolder = location + "\\Soundless";
+                    bool folderExists = Directory.Exists(outputFolder);
+                    if (!folderExists)
+                        Directory.CreateDirectory(outputFolder);
+                    foreach (string filePath in files) {
+                        if (filePath.EndsWith(".MOV"))
+                        {
+                            String fileName = Path.GetFileName(filePath);
+                            
+                            readWriteVideo(filePath, fileName, outputFolder);
+                        }
+                    }
+                    MessageBox.Show("Videos Written: " + files.Length.ToString(), "Message");
+                }
+            }
+        }
+
+        public void readWriteVideo(String filePath, String name, String outputFolder) {
+            
+            String outputVideo = outputFolder + "\\" + name.Split('.')[0] + ".avi";
+            double TotalFrame;
+            double Fps;
+            int FrameNo = 0;
+            VideoCapture capture = new VideoCapture(filePath);
+            TotalFrame = capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameCount);
+            Fps = capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps);
+            int fourcc = Convert.ToInt32(capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.FourCC));
+            int Width = Convert.ToInt32(capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth));
+            int Height = Convert.ToInt32(capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight));
+
+            
+            //VideoWriter writer = new VideoWriter(outputVideo, VideoWriter.Fourcc('X', '2', '6', '4'), Fps, new Size(Width, Height), true);
+            VideoWriter writer = new VideoWriter(outputVideo, VideoWriter.Fourcc('M', 'P', '4', 'V'), Fps, new Size(640, 360), true);
+            Mat m = new Mat();
+            while (FrameNo < TotalFrame) {
+                capture.Read(m);
+                Image<Bgr, byte> frmImage = m.ToImage<Bgr, byte>().Resize(640,360,Inter.Cubic);
+                writer.Write(frmImage.Mat);
+                FrameNo++;
+            }
+            if (writer.IsOpened)
+            {
+                writer.Dispose();
+            }
+
+            Console.WriteLine("Success:  " + outputVideo);
+            capture.Stop();
+            capture.Dispose();
         }
     }
 }

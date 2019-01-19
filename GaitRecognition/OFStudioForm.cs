@@ -36,7 +36,7 @@ namespace GaitRecognition
             // make a list of connected cameras to the computer
             List<String> cameras = new List<string>();
             videoPath = "";
-            frameSkip = 3;
+            frameSkip = 2;
             frameCounter = 0;
             
             DsDevice[] _SystemCameras = DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);

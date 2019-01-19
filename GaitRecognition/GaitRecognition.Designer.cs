@@ -41,6 +41,7 @@
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.processToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.processToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.selectVideoFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1.SuspendLayout();
             this.panel4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureViewBox)).BeginInit();
@@ -110,6 +111,7 @@
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openToolStripMenuItem,
             this.openVideoToolStripMenuItem,
+            this.selectVideoFolderToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
@@ -118,21 +120,21 @@
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // openVideoToolStripMenuItem
             // 
             this.openVideoToolStripMenuItem.Name = "openVideoToolStripMenuItem";
-            this.openVideoToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
+            this.openVideoToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
             this.openVideoToolStripMenuItem.Text = "Open Video";
             this.openVideoToolStripMenuItem.Click += new System.EventHandler(this.openVideoToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             // 
             // processToolStripMenuItem
@@ -150,6 +152,13 @@
             this.processToolStripMenuItem1.Text = "Process";
             this.processToolStripMenuItem1.Click += new System.EventHandler(this.processToolStripMenuItem1_Click);
             // 
+            // selectVideoFolderToolStripMenuItem
+            // 
+            this.selectVideoFolderToolStripMenuItem.Name = "selectVideoFolderToolStripMenuItem";
+            this.selectVideoFolderToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
+            this.selectVideoFolderToolStripMenuItem.Text = "Select Video Folder";
+            this.selectVideoFolderToolStripMenuItem.Click += new System.EventHandler(this.selectVideoFolderToolStripMenuItem_Click);
+            // 
             // GaitRecognition
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -159,7 +168,6 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "GaitRecognition";
             this.Text = "Gait Recognition";
-            this.WindowState = System.Windows.Forms.FormWindowState.Minimized;
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.panel1.ResumeLayout(false);
             this.panel4.ResumeLayout(false);
@@ -186,6 +194,7 @@
         private System.Windows.Forms.ToolStripMenuItem processToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem processToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem openVideoToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem selectVideoFolderToolStripMenuItem;
     }
 }
 
