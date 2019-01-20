@@ -18,6 +18,8 @@ namespace GaitRecognition
 
         int class_label;
         String fileName;
+        StreamWriter streamWriter;
+        StreamWriter streamWriterActivity;
         //public static StreamWriter fs;
         // dividing the complete frame into 3x3 rectangles of equal size
         Rectangle top_left;
@@ -142,7 +144,7 @@ namespace GaitRecognition
             top_right.X = middle_right.X = bottom_right.X = 2 * section_width;
 
             // drawing the rectangles on the Image
-            CvInvoke.Rectangle(img,top_left,new Bgr(Color.Green).MCvScalar,2);
+           /* CvInvoke.Rectangle(img,top_left,new Bgr(Color.Green).MCvScalar,2);
             CvInvoke.Rectangle(img, top_middle, new Bgr(Color.Blue).MCvScalar, 2);
             CvInvoke.Rectangle(img, top_right, new Bgr(Color.Green).MCvScalar, 2);
             CvInvoke.Rectangle(img, middle_left, new Bgr(Color.Green).MCvScalar, 2);
@@ -151,7 +153,7 @@ namespace GaitRecognition
             CvInvoke.Rectangle(img, bottom_left, new Bgr(Color.Green).MCvScalar, 2);
             CvInvoke.Rectangle(img, bottom_middle, new Bgr(Color.Blue).MCvScalar, 2);
             CvInvoke.Rectangle(img, bottom_right, new Bgr(Color.Green).MCvScalar, 2);
-
+            */
             // assigning the lines to their respective section list
             foreach (FeatureVectorOpticalFlow fv in all_lines) {
                 
@@ -284,40 +286,99 @@ namespace GaitRecognition
 
         // Write Feature Vector to CSV Format
         public void WriteFeatureToCSV() {
-           StreamWriter fs = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\FeaturesFile.csv", append: true);
-            fs.WriteLine(""+top_left_line.velx + "," + top_left_line.vely + "," + top_left_line.degrees + "," + top_left_line.distance + ","
-                + top_middle_line.velx + "," + top_middle_line.vely + "," + top_middle_line.degrees + "," + top_middle_line.distance + ","
-                + top_right_line.velx + "," + top_right_line.vely + "," + top_right_line.degrees + "," + top_right_line.distance + ","
-                + middle_left_line.velx + "," + middle_left_line.vely + "," + middle_left_line.degrees + "," + middle_left_line.distance + ","
-                + middle_middle_line.velx + "," + middle_middle_line.vely + "," + middle_middle_line.degrees + "," + middle_middle_line.distance + ","
-                + middle_right_line.velx + "," + middle_right_line.vely + "," + middle_right_line.degrees + "," + middle_right_line.distance + ","
-                + bottom_left_line.velx + "," + bottom_left_line.vely + "," + bottom_left_line.degrees + "," + bottom_left_line.distance + ","
-                + bottom_middle_line.velx + "," + bottom_middle_line.vely + "," + bottom_middle_line.degrees + "," + bottom_middle_line.distance + ","
-                + bottom_right_line.velx + "," + bottom_right_line.vely + "," + bottom_right_line.degrees + "," + bottom_right_line.distance + ","
-                + class_label);
-            fs.Close();
-           StreamWriter streamWriter = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\" + fileName + ".csv",append:true);
-            /*streamWriter.WriteLine("velx_r1," + "vely_r1," + "degrees_r1," + "distance_r1,"
-                + "velx_r2," + "vely_r2," + "degrees_r2," + "distance_r2,"
-                + "velx_r3," + "vely_r3," + "degrees_r3," + "distance_r3,"
-                + "velx_r4," + "vely_r4," + "degrees_r4," + "distance_r4,"
-                + "velx_r5," + "vely_r5," + "degrees_r5," + "distance_r5,"
-                + "velx_r6," + "vely_r6," + "degrees_r6," + "distance_r6,"
-                + "velx_r7," + "vely_r7," + "degrees_r7," + "distance_r7,"
-                + "velx_r8," + "vely_r8," + "degrees_r8," + "distance_r8,"
-                + "velx_r9," + "vely_r9," + "degrees_r9," + "distance_r9,"
-                + "activity");*/
-            streamWriter.WriteLine(top_left_line.velx + "," + top_left_line.vely + "," + top_left_line.degrees + "," + top_left_line.distance + ","
-               + top_middle_line.velx + "," + top_middle_line.vely + "," + top_middle_line.degrees + "," + top_middle_line.distance + ","
-               + top_right_line.velx + "," + top_right_line.vely + "," + top_right_line.degrees + "," + top_right_line.distance + ","
-               + middle_left_line.velx + "," + middle_left_line.vely + "," + middle_left_line.degrees + "," + middle_left_line.distance + ","
-               + middle_middle_line.velx + "," + middle_middle_line.vely + "," + middle_middle_line.degrees + "," + middle_middle_line.distance + ","
-               + middle_right_line.velx + "," + middle_right_line.vely + "," + middle_right_line.degrees + "," + middle_right_line.distance + ","
-               + bottom_left_line.velx + "," + bottom_left_line.vely + "," + bottom_left_line.degrees + "," + bottom_left_line.distance + ","
-               + bottom_middle_line.velx + "," + bottom_middle_line.vely + "," + bottom_middle_line.degrees + "," + bottom_middle_line.distance + ","
-               + bottom_right_line.velx + "," + bottom_right_line.vely + "," + bottom_right_line.degrees + "," + bottom_right_line.distance + ","
-               + class_label);
-           streamWriter.Close();
+            // if all values are 0 then don't write to csv file
+            if(top_left_line.velx != 0 && top_left_line.vely != 0 && top_left_line.degrees != 0 && top_left_line.distance != 0
+                && top_middle_line.velx != 0 && top_middle_line.vely != 0 && top_middle_line.degrees != 0 && top_middle_line.distance != 0
+                && top_right_line.velx != 0 && top_right_line.vely != 0 && top_right_line.degrees != 0 && top_right_line.distance != 0
+                && middle_left_line.velx != 0 && middle_left_line.vely != 0 && middle_left_line.degrees != 0 && middle_left_line.distance != 0
+                && middle_middle_line.velx != 0 && middle_middle_line.vely != 0 && middle_middle_line.degrees != 0 && middle_middle_line.distance != 0
+                && middle_right_line.velx != 0 && middle_right_line.vely != 0 && middle_right_line.degrees != 0 && middle_right_line.distance != 0
+                && bottom_left_line.velx != 0 && bottom_left_line.vely != 0 && bottom_left_line.degrees != 0 && bottom_left_line.distance != 0
+                && bottom_middle_line.velx != 0 && bottom_middle_line.vely != 0 && bottom_middle_line.degrees != 0 && bottom_middle_line.distance != 0
+                && bottom_right_line.velx != 0 && bottom_right_line.vely != 0 && bottom_right_line.degrees != 0 && bottom_right_line.distance != 0)
+            {
+                StreamWriter fs = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\FeaturesFile.csv", append: true);
+                fs.WriteLine("" + top_left_line.velx + "," + top_left_line.vely + "," + top_left_line.degrees + "," + top_left_line.distance + ","
+                    + top_middle_line.velx + "," + top_middle_line.vely + "," + top_middle_line.degrees + "," + top_middle_line.distance + ","
+                    + top_right_line.velx + "," + top_right_line.vely + "," + top_right_line.degrees + "," + top_right_line.distance + ","
+                    + middle_left_line.velx + "," + middle_left_line.vely + "," + middle_left_line.degrees + "," + middle_left_line.distance + ","
+                    + middle_middle_line.velx + "," + middle_middle_line.vely + "," + middle_middle_line.degrees + "," + middle_middle_line.distance + ","
+                    + middle_right_line.velx + "," + middle_right_line.vely + "," + middle_right_line.degrees + "," + middle_right_line.distance + ","
+                    + bottom_left_line.velx + "," + bottom_left_line.vely + "," + bottom_left_line.degrees + "," + bottom_left_line.distance + ","
+                    + bottom_middle_line.velx + "," + bottom_middle_line.vely + "," + bottom_middle_line.degrees + "," + bottom_middle_line.distance + ","
+                    + bottom_right_line.velx + "," + bottom_right_line.vely + "," + bottom_right_line.degrees + "," + bottom_right_line.distance + ","
+                    + class_label);
+                fs.Close();
+               
+                if (class_label == (int)ActivityClass.walking)
+                {
+                    streamWriterActivity = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\WalkingFeatureFile.csv", append: true);
+                    streamWriter = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\walking\\" + fileName + ".csv", append: true);
+                }
+                else if (class_label == (int)ActivityClass.jogging)
+                {
+                    streamWriterActivity = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\JoggingFeatureFile.csv", append: true);
+                    streamWriter = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\jogging\\" + fileName + ".csv", append: true);
+                }
+                else if (class_label == (int)ActivityClass.running)
+                {
+                    streamWriterActivity = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\RunningFeatureFile.csv", append: true);
+                    streamWriter = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\running\\" + fileName + ".csv", append: true);
+                }
+                else if (class_label == (int)ActivityClass.punching)
+                {
+                    streamWriterActivity = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\PunchingFeatureFile.csv", append: true);
+                    streamWriter = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\punching\\" + fileName + ".csv", append: true);
+                }
+                else if (class_label == (int)ActivityClass.kicking)
+                {
+                    streamWriterActivity = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\KickingFeatureFile.csv", append: true);
+                    streamWriter = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\kicking\\" + fileName + ".csv", append: true);
+                }
+                else if (class_label == (int)ActivityClass.waving)
+                {
+                    streamWriterActivity = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\WavingFeatureFile.csv", append: true);
+                    streamWriter = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\waving\\" + fileName + ".csv", append: true);
+                }
+                else if (class_label == (int)ActivityClass.pointing)
+                {
+                    streamWriterActivity = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\PointingFeatureFile.csv", append: true);
+                    streamWriter = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\pointing\\" + fileName + ".csv", append: true);
+                }
+                //streamWriter = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\" + fileName + ".csv", append: true);
+                /*streamWriter.WriteLine("velx_r1," + "vely_r1," + "degrees_r1," + "distance_r1,"
+                    + "velx_r2," + "vely_r2," + "degrees_r2," + "distance_r2,"
+                    + "velx_r3," + "vely_r3," + "degrees_r3," + "distance_r3,"
+                    + "velx_r4," + "vely_r4," + "degrees_r4," + "distance_r4,"
+                    + "velx_r5," + "vely_r5," + "degrees_r5," + "distance_r5,"
+                    + "velx_r6," + "vely_r6," + "degrees_r6," + "distance_r6,"
+                    + "velx_r7," + "vely_r7," + "degrees_r7," + "distance_r7,"
+                    + "velx_r8," + "vely_r8," + "degrees_r8," + "distance_r8,"
+                    + "velx_r9," + "vely_r9," + "degrees_r9," + "distance_r9,"
+                    + "activity");*/
+                streamWriter.WriteLine(top_left_line.velx + "," + top_left_line.vely + "," + top_left_line.degrees + "," + top_left_line.distance + ","
+                   + top_middle_line.velx + "," + top_middle_line.vely + "," + top_middle_line.degrees + "," + top_middle_line.distance + ","
+                   + top_right_line.velx + "," + top_right_line.vely + "," + top_right_line.degrees + "," + top_right_line.distance + ","
+                   + middle_left_line.velx + "," + middle_left_line.vely + "," + middle_left_line.degrees + "," + middle_left_line.distance + ","
+                   + middle_middle_line.velx + "," + middle_middle_line.vely + "," + middle_middle_line.degrees + "," + middle_middle_line.distance + ","
+                   + middle_right_line.velx + "," + middle_right_line.vely + "," + middle_right_line.degrees + "," + middle_right_line.distance + ","
+                   + bottom_left_line.velx + "," + bottom_left_line.vely + "," + bottom_left_line.degrees + "," + bottom_left_line.distance + ","
+                   + bottom_middle_line.velx + "," + bottom_middle_line.vely + "," + bottom_middle_line.degrees + "," + bottom_middle_line.distance + ","
+                   + bottom_right_line.velx + "," + bottom_right_line.vely + "," + bottom_right_line.degrees + "," + bottom_right_line.distance + ","
+                   + class_label);
+                streamWriter.Close();
+                streamWriterActivity.WriteLine(top_left_line.velx + "," + top_left_line.vely + "," + top_left_line.degrees + "," + top_left_line.distance + ","
+                   + top_middle_line.velx + "," + top_middle_line.vely + "," + top_middle_line.degrees + "," + top_middle_line.distance + ","
+                   + top_right_line.velx + "," + top_right_line.vely + "," + top_right_line.degrees + "," + top_right_line.distance + ","
+                   + middle_left_line.velx + "," + middle_left_line.vely + "," + middle_left_line.degrees + "," + middle_left_line.distance + ","
+                   + middle_middle_line.velx + "," + middle_middle_line.vely + "," + middle_middle_line.degrees + "," + middle_middle_line.distance + ","
+                   + middle_right_line.velx + "," + middle_right_line.vely + "," + middle_right_line.degrees + "," + middle_right_line.distance + ","
+                   + bottom_left_line.velx + "," + bottom_left_line.vely + "," + bottom_left_line.degrees + "," + bottom_left_line.distance + ","
+                   + bottom_middle_line.velx + "," + bottom_middle_line.vely + "," + bottom_middle_line.degrees + "," + bottom_middle_line.distance + ","
+                   + bottom_right_line.velx + "," + bottom_right_line.vely + "," + bottom_right_line.degrees + "," + bottom_right_line.distance + ","
+                   + class_label);
+                streamWriterActivity.Close();
+            }
         }
         // Calculate Optical Flow Using Farne back Algorithm
         public  Image<Hsv, byte> CalculateOpticalFlow(Image<Gray, byte> prevFrame, Image<Gray, byte> nextFrame, int frameNumber = 0) {
@@ -353,7 +414,10 @@ namespace GaitRecognition
                     if (p1.X == p2.X && p1.Y == p2.Y) {
                         continue;
                     }
-                    if (intensity < 5) { // if distance is smaller then ignore
+                    if (intensity < 2) { // if distance is smaller then ignore
+                        continue;
+                    }
+                    if (velxHere == 0 && velyHere == 0 && degrees == 0 && intensity == 0) {
                         continue;
                     }
                     this.all_lines.Add(new FeatureVectorOpticalFlow(Math.Round(velxHere, 2), Math.Round(velyHere, 2), Math.Round(degrees, 2), Math.Round(intensity, 2), new LineSegment2D( p1, p2)));

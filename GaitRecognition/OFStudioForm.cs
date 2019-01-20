@@ -22,7 +22,7 @@ namespace GaitRecognition
         public String videoPath;
         int frameSkip;
         int frameCounter;
-
+        int activityLabel;
         //Image<Gray, byte> grayImage;
         //Image<Bgr, byte> BgrImage;
         Image<Gray, byte> prevFrame;
@@ -31,14 +31,14 @@ namespace GaitRecognition
         String filename;
         public OFStudioForm()
         {
-            
+
             InitializeComponent();
             // make a list of connected cameras to the computer
             List<String> cameras = new List<string>();
             videoPath = "";
             frameSkip = 2;
             frameCounter = 0;
-            
+            activityLabel = (int)ActivityClass.pointing;
             DsDevice[] _SystemCameras = DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);
 
             // if there is any camera
@@ -51,13 +51,13 @@ namespace GaitRecognition
             else { // otherwise show error message
                 MessageBox.Show(" 0 Cameras Detected");
             }
-            
+
             // show the list of cameras in the drop down list
             comboBoxCameraList.DataSource = cameras;
         }
 
         Mat _frame = new Mat();
-            
+
         private void imageFrameCaptured(object sender, EventArgs e)
         {
             frameCounter = frameCounter + 1;
@@ -70,7 +70,7 @@ namespace GaitRecognition
                     if (_capture != null)
                     {
                         if (frameCounter == 1) {
-                            prevFrame =  _capture.QueryFrame().ToImage<Gray, byte>().Resize(200, 200, Emgu.CV.CvEnum.Inter.Area);
+                            prevFrame = _capture.QueryFrame().ToImage<Gray, byte>().Resize(200, 200, Emgu.CV.CvEnum.Inter.Area);
                         }
                         else {// if (frameCounter % frameSkip == 0) { // use only the frames after skipped frames
                               //BgrImage = _capture.QueryFrame().ToImage<Bgr, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Area);
@@ -78,9 +78,9 @@ namespace GaitRecognition
                             for (int i = 0; i < frameSkip; i++) {
                                 _capture.Grab(); // skip the number of frames
                             }
-                            _opticalflow = new OpticalFlow(filename, (int)ActivityClass.jogging);
+                            _opticalflow = new OpticalFlow(filename, (int)ActivityClass.walking);
                             nextFrame = _capture.QueryFrame().ToImage<Gray, byte>().Resize(200, 200, Emgu.CV.CvEnum.Inter.Area);
-                            Image<Hsv, byte> outputImg  = _opticalflow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter);
+                            Image<Hsv, byte> outputImg = _opticalflow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter);
                             opticalViewBox.Image = outputImg;
                             outputImg.Dispose();
                             //_opticalflow.PyrLkOpticalFlow(prevFrame, nextFrame);
@@ -88,7 +88,6 @@ namespace GaitRecognition
                             pictureViewBox.Image = nextFrame;
                             prevFrame = nextFrame.Clone();
                             nextFrame.Dispose();
-                            
                         }
                     }
 
@@ -117,7 +116,7 @@ namespace GaitRecognition
                 {
                     if (_capture != null)
                     {
-                        
+
                         if (frameCounter == 1)
                         {
                             _capture.Retrieve(_frame, 0);
@@ -127,7 +126,7 @@ namespace GaitRecognition
                             _capture.Retrieve(_frame, 0);
                             nextFrame = _frame.ToImage<Gray, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Cubic);
                             _opticalflow = new OpticalFlow("", (int)ActivityClass.walking);
-                            opticalViewBox.Image =  _opticalflow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter);
+                            opticalViewBox.Image = _opticalflow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter);
                             pictureViewBox.Image = nextFrame;
                             prevFrame.Dispose();
                             prevFrame = nextFrame.Clone();
@@ -195,7 +194,7 @@ namespace GaitRecognition
                     isPlaying = true;
                     btnPlayPause.BackgroundImage = Properties.Resources.pause36;
                 }
-                else if(!isPlaying && _capture != null) { // if camera is already initialized but paused
+                else if (!isPlaying && _capture != null) { // if camera is already initialized but paused
 
                     _capture.ImageGrabbed += imageFrameCaptured;
                     _capture.Start();
@@ -206,7 +205,7 @@ namespace GaitRecognition
             } // end if using live camera
             // if using video input
             else
-            { 
+            {
                 // check if video is already playing then pause
                 if (isPlaying)
                 {
@@ -246,6 +245,8 @@ namespace GaitRecognition
         private void btnBrowseVideo_Click(object sender, EventArgs e)
         {
             videoPath = GaitRecognition.openFileDialogue();
+            if (videoPath == null || videoPath == "")
+                return;
             FileInfo fi = new FileInfo(videoPath);
             filename = fi.Name.Split('.')[0];
             textBoxVideoPath.Text = videoPath;
@@ -258,6 +259,96 @@ namespace GaitRecognition
         {
             frameSkip = (int)numericFrameSkip.Value;
             //_capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.PosFrames, frameSkip);
+        }
+
+        private void selectVideosFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var fbd = new FolderBrowserDialog())
+            {
+                fbd.RootFolder = Environment.SpecialFolder.MyComputer;
+                DialogResult result = fbd.ShowDialog();
+
+                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                {
+                    string[] files = Directory.GetFiles(fbd.SelectedPath);
+                    //String location = Path.GetDirectoryName(files[0]);
+                    //String outputFolder = location + "\\Soundless";
+                    //bool folderExists = Directory.Exists(outputFolder);
+                    //if (!folderExists)
+                    //   Directory.CreateDirectory(outputFolder);
+                    batchProcess(files);
+                }
+            }
+        }
+
+        public void batchProcess(String[] files) {
+
+            foreach (string filePath in files)
+            {
+
+                if (filePath.EndsWith(".avi"))
+                {
+                    if (_capture != null)
+                    {
+                        Application.Idle -= imageFrameCaptured;
+                        _capture.Stop();
+                        _capture.Dispose();
+                        _capture = null;
+                    }
+                    filename = Path.GetFileName(filePath);
+                    _capture = new VideoCapture(filePath);
+                    int TotalFrames = Convert.ToInt32(_capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameCount));
+
+                    for (int i = 0; i < TotalFrames; i++) {
+                        try
+                        {
+                            if (_capture != null)
+                            {
+                                if (i == 0)
+                                {
+                                    prevFrame = _capture.QueryFrame().ToImage<Gray, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Area);
+                                }
+                                else
+                                {
+                                    for (int j = 0; j < frameSkip; j++)
+                                    {
+                                        _capture.Grab(); // skip the number of frames
+                                        i++;
+                                    }
+                                    _opticalflow = new OpticalFlow(filename, activityLabel);
+                                    nextFrame = _capture.QueryFrame().ToImage<Gray, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Area);
+                                    Image<Hsv, byte> outputImg = _opticalflow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter);
+                                    opticalViewBox.Image = outputImg;
+                                    outputImg.Dispose();
+                                    //_opticalflow.PyrLkOpticalFlow(prevFrame, nextFrame);
+                                    prevFrame.Dispose();
+                                    pictureViewBox.Image = nextFrame;
+                                    prevFrame = nextFrame.Clone();
+                                    nextFrame.Dispose();
+                                }
+                            }
+
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+
+                            _capture.Pause();
+                            _capture.Stop();
+                            _capture.Dispose();
+                            _capture = null;
+
+                            isPlaying = false;
+                            // change the button icon to play
+                            btnPlayPause.BackgroundImage = Properties.Resources.play36;
+                        }
+                    }
+                    //Application.Idle += imageFrameCaptured;
+                    //readWriteVideo(filePath, fileName, outputFolder);
+                }
+                Console.WriteLine("Features Extracted: " + filename);
+            }
+            MessageBox.Show("Videos Processed: " + files.Length.ToString(), "Message");
         }
     }
 }

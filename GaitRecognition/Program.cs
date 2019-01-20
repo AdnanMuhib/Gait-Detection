@@ -16,7 +16,7 @@ namespace GaitRecognition
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new GaitRecognition());
+            Application.Run(new OFStudioForm());
         }
     }
 }

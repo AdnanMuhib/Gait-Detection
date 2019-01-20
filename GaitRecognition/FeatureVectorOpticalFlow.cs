@@ -35,8 +35,11 @@ namespace GaitRecognition
     }
     public enum ActivityClass{
         walking = 0,
-        running = 1,
-        jogging = 2,
-        boxing = 3
+        jogging = 1,
+        running = 2,
+        punching = 3,
+        kicking = 4,
+        waving = 5,
+        pointing = 6
     }
 }

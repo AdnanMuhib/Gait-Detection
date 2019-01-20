@@ -31,6 +31,7 @@
             this.components = new System.ComponentModel.Container();
             this.MainMenu = new System.Windows.Forms.MenuStrip();
             this.fileMenu = new System.Windows.Forms.ToolStripMenuItem();
+            this.selectVideosFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statsMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.MainPanel = new System.Windows.Forms.Panel();
@@ -78,9 +79,18 @@
             // 
             // fileMenu
             // 
+            this.fileMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.selectVideosFolderToolStripMenuItem});
             this.fileMenu.Name = "fileMenu";
             this.fileMenu.Size = new System.Drawing.Size(37, 20);
             this.fileMenu.Text = "File";
+            // 
+            // selectVideosFolderToolStripMenuItem
+            // 
+            this.selectVideosFolderToolStripMenuItem.Name = "selectVideosFolderToolStripMenuItem";
+            this.selectVideosFolderToolStripMenuItem.Size = new System.Drawing.Size(179, 22);
+            this.selectVideosFolderToolStripMenuItem.Text = "Select Videos Folder";
+            this.selectVideosFolderToolStripMenuItem.Click += new System.EventHandler(this.selectVideosFolderToolStripMenuItem_Click);
             // 
             // statsMenu
             // 
@@ -169,6 +179,7 @@
             // radioButtonVideo
             // 
             this.radioButtonVideo.AutoSize = true;
+            this.radioButtonVideo.Checked = true;
             this.radioButtonVideo.Location = new System.Drawing.Point(59, 45);
             this.radioButtonVideo.Name = "radioButtonVideo";
             this.radioButtonVideo.Size = new System.Drawing.Size(52, 17);
@@ -185,7 +196,6 @@
             this.radioButtonCamera.Name = "radioButtonCamera";
             this.radioButtonCamera.Size = new System.Drawing.Size(84, 17);
             this.radioButtonCamera.TabIndex = 0;
-            this.radioButtonCamera.TabStop = true;
             this.radioButtonCamera.Text = "Live Camera";
             this.radioButtonCamera.UseVisualStyleBackColor = true;
             this.radioButtonCamera.CheckedChanged += new System.EventHandler(this.radioButtonCamera_CheckedChanged);
@@ -217,6 +227,7 @@
             // 
             // pictureViewBox
             // 
+            this.pictureViewBox.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.pictureViewBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pictureViewBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pictureViewBox.Location = new System.Drawing.Point(0, 0);
@@ -228,6 +239,7 @@
             // 
             // panelPlayerControls
             // 
+            this.panelPlayerControls.BackColor = System.Drawing.SystemColors.AppWorkspace;
             this.panelPlayerControls.Controls.Add(this.btnStop);
             this.panelPlayerControls.Controls.Add(this.btnPlayPause);
             this.panelPlayerControls.Dock = System.Windows.Forms.DockStyle.Bottom;
@@ -273,6 +285,7 @@
             // 
             // opticalViewBox
             // 
+            this.opticalViewBox.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.opticalViewBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.opticalViewBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.opticalViewBox.Location = new System.Drawing.Point(0, 0);
@@ -284,6 +297,7 @@
             // 
             // opticalFlowFooterPanel
             // 
+            this.opticalFlowFooterPanel.BackColor = System.Drawing.SystemColors.AppWorkspace;
             this.opticalFlowFooterPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.opticalFlowFooterPanel.Location = new System.Drawing.Point(0, 342);
             this.opticalFlowFooterPanel.Name = "opticalFlowFooterPanel";
@@ -298,6 +312,7 @@
             this.Controls.Add(this.MainPanel);
             this.Controls.Add(this.MainMenu);
             this.MainMenuStrip = this.MainMenu;
+            this.MaximizeBox = false;
             this.Name = "OFStudioForm";
             this.Text = "Optical Flow Studio";
             this.MainMenu.ResumeLayout(false);
@@ -343,5 +358,6 @@
         private Emgu.CV.UI.ImageBox pictureViewBox;
         private System.Windows.Forms.Panel opticalFlowFooterPanel;
         private System.Windows.Forms.Panel bodyPanel;
+        private System.Windows.Forms.ToolStripMenuItem selectVideosFolderToolStripMenuItem;
     }
 }
