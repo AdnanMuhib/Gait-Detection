@@ -186,8 +186,11 @@ namespace GaitRecognition
         {
             n = n + 0.5;
             n = Math.Floor(n);
-            if (n > 2) {
-                n = 2;
+            if (n == 2) {
+                n = 3;
+            }
+            if (n > 6) {
+                n = 6;
             }
             return (int)n;
             /*int u = 0;

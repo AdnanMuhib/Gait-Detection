@@ -313,6 +313,8 @@
             this.Controls.Add(this.MainMenu);
             this.MainMenuStrip = this.MainMenu;
             this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(976, 568);
+            this.MinimumSize = new System.Drawing.Size(976, 568);
             this.Name = "OFStudioForm";
             this.Text = "Optical Flow Studio";
             this.MainMenu.ResumeLayout(false);

@@ -54,6 +54,14 @@ namespace GaitRecognition
 
             // show the list of cameras in the drop down list
             comboBoxCameraList.DataSource = cameras;
+           
+           MLP mlp = new MLP();
+           mlp.LoadTrainData(@"C:\Users\Antivirus\Desktop\of\train.csv");
+           mlp.Train();
+            MessageBox.Show("Training Completed");
+            mlp.LoadTestData(@"C:\Users\Antivirus\Desktop\of\test.csv");
+           mlp.Predict();
+            MessageBox.Show("Prediction Completed");
         }
 
         Mat _frame = new Mat();
