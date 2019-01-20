@@ -52,6 +52,8 @@
             this.OpticalFlowPanel = new System.Windows.Forms.Panel();
             this.opticalViewBox = new Emgu.CV.UI.ImageBox();
             this.opticalFlowFooterPanel = new System.Windows.Forms.Panel();
+            this.label2 = new System.Windows.Forms.Label();
+            this.labelPrediction = new System.Windows.Forms.Label();
             this.MainMenu.SuspendLayout();
             this.MainPanel.SuspendLayout();
             this.HeaderPanel.SuspendLayout();
@@ -62,6 +64,7 @@
             this.panelPlayerControls.SuspendLayout();
             this.OpticalFlowPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.opticalViewBox)).BeginInit();
+            this.opticalFlowFooterPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // MainMenu
@@ -298,11 +301,34 @@
             // opticalFlowFooterPanel
             // 
             this.opticalFlowFooterPanel.BackColor = System.Drawing.SystemColors.AppWorkspace;
+            this.opticalFlowFooterPanel.Controls.Add(this.labelPrediction);
+            this.opticalFlowFooterPanel.Controls.Add(this.label2);
             this.opticalFlowFooterPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.opticalFlowFooterPanel.Location = new System.Drawing.Point(0, 342);
             this.opticalFlowFooterPanel.Name = "opticalFlowFooterPanel";
             this.opticalFlowFooterPanel.Size = new System.Drawing.Size(456, 55);
             this.opticalFlowFooterPanel.TabIndex = 3;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
+            this.label2.Location = new System.Drawing.Point(97, 17);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(152, 25);
+            this.label2.TabIndex = 0;
+            this.label2.Text = "Person Activity: ";
+            // 
+            // labelPrediction
+            // 
+            this.labelPrediction.AutoSize = true;
+            this.labelPrediction.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
+            this.labelPrediction.ForeColor = System.Drawing.Color.Green;
+            this.labelPrediction.Location = new System.Drawing.Point(268, 17);
+            this.labelPrediction.Name = "labelPrediction";
+            this.labelPrediction.Size = new System.Drawing.Size(61, 25);
+            this.labelPrediction.TabIndex = 1;
+            this.labelPrediction.Text = "Static";
             // 
             // OFStudioForm
             // 
@@ -331,6 +357,8 @@
             this.panelPlayerControls.ResumeLayout(false);
             this.OpticalFlowPanel.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.opticalViewBox)).EndInit();
+            this.opticalFlowFooterPanel.ResumeLayout(false);
+            this.opticalFlowFooterPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -361,5 +389,7 @@
         private System.Windows.Forms.Panel opticalFlowFooterPanel;
         private System.Windows.Forms.Panel bodyPanel;
         private System.Windows.Forms.ToolStripMenuItem selectVideosFolderToolStripMenuItem;
+        private System.Windows.Forms.Label labelPrediction;
+        private System.Windows.Forms.Label label2;
     }
 }

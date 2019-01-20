@@ -29,6 +29,7 @@ namespace GaitRecognition
         Image<Gray, byte> nextFrame;
         OpticalFlow _opticalflow;
         String filename;
+        MLP mlp;
         public OFStudioForm()
         {
 
@@ -55,13 +56,15 @@ namespace GaitRecognition
             // show the list of cameras in the drop down list
             comboBoxCameraList.DataSource = cameras;
            
-           MLP mlp = new MLP();
-           mlp.LoadTrainData(@"C:\Users\Antivirus\Desktop\of\train.csv");
-           mlp.Train();
-            MessageBox.Show("Training Completed");
-            mlp.LoadTestData(@"C:\Users\Antivirus\Desktop\of\test.csv");
-           mlp.Predict();
-            MessageBox.Show("Prediction Completed");
+           mlp = new MLP();
+           mlp.LoadTrainedModel("ann_mlp_model.xml");
+           //mlp.LoadTrainData(@"C:\Users\Antivirus\Desktop\of\train.csv");
+           //mlp.Train();
+           //mlp.SaveModel("ann_mlp_model.xml");
+           //MessageBox.Show("Training Completed");
+           //mlp.LoadTestData(@"C:\Users\Antivirus\Desktop\of\test.csv");
+           //mlp.Predict();
+           //MessageBox.Show("Prediction Completed");
         }
 
         Mat _frame = new Mat();
@@ -89,6 +92,8 @@ namespace GaitRecognition
                             _opticalflow = new OpticalFlow(filename, (int)ActivityClass.walking);
                             nextFrame = _capture.QueryFrame().ToImage<Gray, byte>().Resize(200, 200, Emgu.CV.CvEnum.Inter.Area);
                             Image<Hsv, byte> outputImg = _opticalflow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter);
+                            int prediction = mlp.Inference(_opticalflow.GetFeatureMatrix());
+                            labelPrediction.Text = Enum.GetName(typeof(ActivityClass), prediction);
                             opticalViewBox.Image = outputImg;
                             outputImg.Dispose();
                             //_opticalflow.PyrLkOpticalFlow(prevFrame, nextFrame);

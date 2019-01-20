@@ -277,7 +277,7 @@ namespace GaitRecognition
                 bottom_right_line = getBigLine(bottom_right_lines);
                 CvInvoke.ArrowedLine(img, bottom_right_line.line.P1, bottom_right_line.line.P2, new Bgr(Color.White).MCvScalar, 1);
             }
-            WriteFeatureToCSV();
+            //WriteFeatureToCSV();
             ///CvInvoke.Imshow("3x3 Frames", img);
             //CvInvoke.Imwrite("C:\\Users\\Antivirus\\Desktop\\of\\Frames.png",img);
             //CvInvoke.Imwrite("C:\\Users\\Antivirus\\Desktop\\of\\opticalflow" + (frameNumber - 1) + "-" + (frameNumber) + ".png", img);
@@ -379,6 +379,54 @@ namespace GaitRecognition
                    + class_label);
                 streamWriterActivity.Close();
             }
+        }
+        public Matrix<float> GetFeatureMatrix() {
+            Matrix<float> sample = new Matrix<float>(1,36);
+            sample[0, 0] = (float)top_left_line.velx;
+            sample[0, 1] = (float)top_left_line.vely;
+            sample[0, 2] = (float)top_left_line.degrees;
+            sample[0, 3] = (float)top_left_line.distance;
+
+            sample[0, 4] = (float)top_middle_line.velx;
+            sample[0, 5] = (float)top_middle_line.vely;
+            sample[0, 6] = (float)top_middle_line.degrees;
+            sample[0, 7] = (float)top_middle_line.distance;
+
+            sample[0, 8] = (float)top_right_line.velx;
+            sample[0, 9] = (float)top_right_line.vely;
+            sample[0, 10] = (float)top_right_line.degrees;
+            sample[0, 11] = (float)top_right_line.distance;
+
+            sample[0, 12] = (float)middle_left_line.velx;
+            sample[0, 13] = (float)middle_left_line.vely;
+            sample[0, 14] = (float)middle_left_line.degrees;
+            sample[0, 15] = (float)middle_left_line.distance;
+
+            sample[0, 16] = (float)middle_middle_line.velx;
+            sample[0, 17] = (float)middle_middle_line.vely;
+            sample[0, 18] = (float)middle_middle_line.degrees;
+            sample[0, 19] = (float)middle_middle_line.distance;
+
+            sample[0, 20] = (float)middle_right_line.velx;
+            sample[0, 21] = (float)middle_right_line.vely;
+            sample[0, 22] = (float)middle_right_line.degrees;
+            sample[0, 23] = (float)middle_right_line.distance;
+
+            sample[0, 24] = (float)bottom_left_line.velx;
+            sample[0, 25] = (float)bottom_left_line.vely;
+            sample[0, 26] = (float)bottom_left_line.degrees;
+            sample[0, 27] = (float)bottom_left_line.distance;
+
+            sample[0, 28] = (float)bottom_middle_line.velx;
+            sample[0, 29] = (float)bottom_middle_line.vely;
+            sample[0, 30] = (float)bottom_middle_line.degrees;
+            sample[0, 31] = (float)bottom_middle_line.distance;
+
+            sample[0, 32] = (float)bottom_right_line.velx;
+            sample[0, 33] = (float)bottom_right_line.vely;
+            sample[0, 34] = (float)bottom_right_line.degrees;
+            sample[0, 35] = (float)bottom_right_line.distance;
+            return sample;
         }
         // Calculate Optical Flow Using Farne back Algorithm
         public  Image<Hsv, byte> CalculateOpticalFlow(Image<Gray, byte> prevFrame, Image<Gray, byte> nextFrame, int frameNumber = 0) {

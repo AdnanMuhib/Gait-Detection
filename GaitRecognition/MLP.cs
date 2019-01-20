@@ -181,6 +181,21 @@ namespace GaitRecognition
                 Console.WriteLine("Error occured Predicting..." + ex.Message);
             }
         }
+
+        // Inference for Single Instance
+        public int Inference(Matrix<float> sample) {
+            Matrix<float> prediction = new Matrix<float>(1, 1);
+            sample = new Matrix<float>(1, 36);
+            try
+            {
+                nnet.Predict(sample, prediction);
+            }
+            catch (Exception ex) {
+                Console.WriteLine(ex.Message);
+            }
+            Console.WriteLine("Prediction: " + prediction.Data[0, 0]);
+            return GetCloseValue(prediction.Data[0, 0]);
+        }
         // PostProcess the prediction
         int GetCloseValue(double n)
         {
@@ -216,6 +231,22 @@ namespace GaitRecognition
         public void Evaluate() {
 
         }
+        
+        // Saving the Trained Model
+        public void SaveModel(string ModelFileName) {
+            #if !NETFX_CORE
+                if (File.Exists(ModelFileName)) // if model already exists delete model
+                    File.Delete(ModelFileName);
+                nnet.Save(ModelFileName); // save the model
+            #endif
+        }
 
+        // Loading the Trained Model
+        public void LoadTrainedModel(String ModelFileName) {
+            #if !NETFX_CORE
+                // Loading the Trained Model from File
+                nnet.Load(ModelFileName);
+            #endif
+        }
     }
 }
