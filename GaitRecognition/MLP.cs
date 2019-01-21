@@ -185,15 +185,17 @@ namespace GaitRecognition
         // Inference for Single Instance
         public int Inference(Matrix<float> sample) {
             Matrix<float> prediction = new Matrix<float>(1, 1);
-            sample = new Matrix<float>(1, 36);
             try
             {
-                nnet.Predict(sample, prediction);
+                nnet.Predict(sample,prediction);
+                Console.WriteLine("Prediction: " + prediction[0,0]);
             }
             catch (Exception ex) {
                 Console.WriteLine(ex.Message);
             }
-            Console.WriteLine("Prediction: " + prediction.Data[0, 0]);
+            if (prediction.Data[0, 0] == 2.10772) {
+                return -1;
+            }
             return GetCloseValue(prediction.Data[0, 0]);
         }
         // PostProcess the prediction

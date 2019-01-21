@@ -58,13 +58,13 @@ namespace GaitRecognition
            
            mlp = new MLP();
            mlp.LoadTrainedModel("ann_mlp_model.xml");
-           //mlp.LoadTrainData(@"C:\Users\Antivirus\Desktop\of\train.csv");
-           //mlp.Train();
-           //mlp.SaveModel("ann_mlp_model.xml");
-           //MessageBox.Show("Training Completed");
-           //mlp.LoadTestData(@"C:\Users\Antivirus\Desktop\of\test.csv");
-           //mlp.Predict();
-           //MessageBox.Show("Prediction Completed");
+            //mlp.LoadTrainData(@"C:\Users\Antivirus\Desktop\of\train.csv");
+            //mlp.Train();
+            //mlp.SaveModel("ann_mlp_model.xml");
+            //MessageBox.Show("Training Completed");
+            //mlp.LoadTestData(@"C:\Users\Antivirus\Desktop\of\test.csv");
+            //mlp.Predict();
+            //MessageBox.Show("Prediction Completed");
         }
 
         Mat _frame = new Mat();
@@ -92,8 +92,14 @@ namespace GaitRecognition
                             _opticalflow = new OpticalFlow(filename, (int)ActivityClass.walking);
                             nextFrame = _capture.QueryFrame().ToImage<Gray, byte>().Resize(200, 200, Emgu.CV.CvEnum.Inter.Area);
                             Image<Hsv, byte> outputImg = _opticalflow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter);
-                            int prediction = mlp.Inference(_opticalflow.GetFeatureMatrix());
-                            labelPrediction.Text = Enum.GetName(typeof(ActivityClass), prediction);
+                            var sample = _opticalflow.GetFeatureMatrix();
+                            int prediction = mlp.Inference(sample);
+                            if (prediction == -1) {
+                                labelPrediction.Text = "Static";
+                            }
+                            else {
+                                labelPrediction.Text = Enum.GetName(typeof(ActivityClass), prediction);
+                            }
                             opticalViewBox.Image = outputImg;
                             outputImg.Dispose();
                             //_opticalflow.PyrLkOpticalFlow(prevFrame, nextFrame);
