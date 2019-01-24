@@ -20,6 +20,7 @@ namespace GaitRecognition
         String fileName;
         StreamWriter streamWriter;
         StreamWriter streamWriterActivity;
+        String CSVFilesPath = "C:\\Users\\Antivirus\\Desktop\\of\\";
         //public static StreamWriter fs;
         // dividing the complete frame into 3x3 rectangles of equal size
         Rectangle top_left;
@@ -297,7 +298,7 @@ namespace GaitRecognition
                 && bottom_middle_line.velx != 0 && bottom_middle_line.vely != 0 && bottom_middle_line.degrees != 0 && bottom_middle_line.distance != 0
                 && bottom_right_line.velx != 0 && bottom_right_line.vely != 0 && bottom_right_line.degrees != 0 && bottom_right_line.distance != 0)
             {
-                StreamWriter fs = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\FeaturesFile.csv", append: true);
+                StreamWriter fs = new StreamWriter(CSVFilesPath + "FeaturesFile.csv", append: true);
                 fs.WriteLine("" + top_left_line.velx + "," + top_left_line.vely + "," + top_left_line.degrees + "," + top_left_line.distance + ","
                     + top_middle_line.velx + "," + top_middle_line.vely + "," + top_middle_line.degrees + "," + top_middle_line.distance + ","
                     + top_right_line.velx + "," + top_right_line.vely + "," + top_right_line.degrees + "," + top_right_line.distance + ","
@@ -312,38 +313,38 @@ namespace GaitRecognition
                
                 if (class_label == (int)ActivityClass.walking)
                 {
-                    streamWriterActivity = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\WalkingFeatureFile.csv", append: true);
-                    streamWriter = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\walking\\" + fileName + ".csv", append: true);
+                    streamWriterActivity = new StreamWriter(CSVFilesPath + "WalkingFeatureFile.csv", append: true);
+                    streamWriter = new StreamWriter(CSVFilesPath + "walking\\" + fileName + ".csv", append: true);
                 }
                 else if (class_label == (int)ActivityClass.jogging)
                 {
-                    streamWriterActivity = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\JoggingFeatureFile.csv", append: true);
-                    streamWriter = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\jogging\\" + fileName + ".csv", append: true);
+                    streamWriterActivity = new StreamWriter(CSVFilesPath + "JoggingFeatureFile.csv", append: true);
+                    streamWriter = new StreamWriter(CSVFilesPath + "jogging\\" + fileName + ".csv", append: true);
                 }
                 else if (class_label == (int)ActivityClass.running)
                 {
-                    streamWriterActivity = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\RunningFeatureFile.csv", append: true);
-                    streamWriter = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\running\\" + fileName + ".csv", append: true);
+                    streamWriterActivity = new StreamWriter(CSVFilesPath + "RunningFeatureFile.csv", append: true);
+                    streamWriter = new StreamWriter(CSVFilesPath + "running\\" + fileName + ".csv", append: true);
                 }
                 else if (class_label == (int)ActivityClass.punching)
                 {
-                    streamWriterActivity = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\PunchingFeatureFile.csv", append: true);
-                    streamWriter = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\punching\\" + fileName + ".csv", append: true);
+                    streamWriterActivity = new StreamWriter(CSVFilesPath + "PunchingFeatureFile.csv", append: true);
+                    streamWriter = new StreamWriter(CSVFilesPath + "punching\\" + fileName + ".csv", append: true);
                 }
                 else if (class_label == (int)ActivityClass.kicking)
                 {
-                    streamWriterActivity = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\KickingFeatureFile.csv", append: true);
-                    streamWriter = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\kicking\\" + fileName + ".csv", append: true);
+                    streamWriterActivity = new StreamWriter(CSVFilesPath + "KickingFeatureFile.csv", append: true);
+                    streamWriter = new StreamWriter(CSVFilesPath + "kicking\\" + fileName + ".csv", append: true);
                 }
                 else if (class_label == (int)ActivityClass.waving)
                 {
-                    streamWriterActivity = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\WavingFeatureFile.csv", append: true);
-                    streamWriter = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\waving\\" + fileName + ".csv", append: true);
+                    streamWriterActivity = new StreamWriter(CSVFilesPath + "WavingFeatureFile.csv", append: true);
+                    streamWriter = new StreamWriter(CSVFilesPath + "waving\\" + fileName + ".csv", append: true);
                 }
                 else if (class_label == (int)ActivityClass.pointing)
                 {
-                    streamWriterActivity = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\PointingFeatureFile.csv", append: true);
-                    streamWriter = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\pointing\\" + fileName + ".csv", append: true);
+                    streamWriterActivity = new StreamWriter(CSVFilesPath + "PointingFeatureFile.csv", append: true);
+                    streamWriter = new StreamWriter(CSVFilesPath + "pointing\\" + fileName + ".csv", append: true);
                 }
                 //streamWriter = new StreamWriter("C:\\Users\\Antivirus\\Desktop\\of\\" + fileName + ".csv", append: true);
                 /*streamWriter.WriteLine("velx_r1," + "vely_r1," + "degrees_r1," + "distance_r1,"

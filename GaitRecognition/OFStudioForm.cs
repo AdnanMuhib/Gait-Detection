@@ -40,7 +40,7 @@ namespace GaitRecognition
             videoPath = "";
             frameSkip = 0;
             frameCounter = 0;
-            activityLabel = (int)ActivityClass.waving;
+            activityLabel = (int)ActivityClass.pointing;
             DsDevice[] _SystemCameras = DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);
 
             // if there is any camera
