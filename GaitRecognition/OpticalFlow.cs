@@ -227,57 +227,57 @@ namespace GaitRecognition
 
             if (top_left_lines.Count > 0) {
                 top_left_line = getBigLine(top_left_lines);
-                CvInvoke.ArrowedLine(img, top_left_line.line.P1, top_left_line.line.P2, new Bgr(Color.White).MCvScalar, 1);
+                //CvInvoke.ArrowedLine(img, top_left_line.line.P1, top_left_line.line.P2, new Bgr(Color.White).MCvScalar, 1);
             }
 
             if (top_middle_lines.Count > 0)
             {
                 top_middle_line = getBigLine(top_middle_lines);
-                CvInvoke.ArrowedLine(img, top_middle_line.line.P1, top_middle_line.line.P2, new Bgr(Color.White).MCvScalar, 1);
+                //CvInvoke.ArrowedLine(img, top_middle_line.line.P1, top_middle_line.line.P2, new Bgr(Color.White).MCvScalar, 1);
             }
 
             if (top_right_lines.Count > 0)
             {
                 top_right_line = getBigLine(top_right_lines);
-                CvInvoke.ArrowedLine(img, top_right_line.line.P1, top_right_line.line.P2, new Bgr(Color.White).MCvScalar, 1);
+                //CvInvoke.ArrowedLine(img, top_right_line.line.P1, top_right_line.line.P2, new Bgr(Color.White).MCvScalar, 1);
             }
 
 
             if (middle_left_lines.Count > 0)
             {
                 middle_left_line = getBigLine(middle_left_lines);
-                CvInvoke.ArrowedLine(img, middle_left_line.line.P1, middle_left_line.line.P2, new Bgr(Color.White).MCvScalar, 1);
+                //CvInvoke.ArrowedLine(img, middle_left_line.line.P1, middle_left_line.line.P2, new Bgr(Color.White).MCvScalar, 1);
             }
 
             if (middle_middle_lines.Count > 0)
             {
                 middle_middle_line = getBigLine(middle_middle_lines);
-                CvInvoke.ArrowedLine(img, middle_middle_line.line.P1, middle_middle_line.line.P2, new Bgr(Color.White).MCvScalar, 1);
+                //CvInvoke.ArrowedLine(img, middle_middle_line.line.P1, middle_middle_line.line.P2, new Bgr(Color.White).MCvScalar, 1);
             }
 
             if (middle_right_lines.Count > 0)
             {
                 middle_right_line = getBigLine(middle_right_lines);
-                CvInvoke.ArrowedLine(img, middle_right_line.line.P1, middle_right_line.line.P2, new Bgr(Color.White).MCvScalar, 1);
+                //CvInvoke.ArrowedLine(img, middle_right_line.line.P1, middle_right_line.line.P2, new Bgr(Color.White).MCvScalar, 1);
             }
 
 
             if (bottom_left_lines.Count > 0)
             {
                 bottom_left_line = getBigLine(bottom_left_lines);
-                CvInvoke.ArrowedLine(img, bottom_left_line.line.P1, bottom_left_line.line.P2, new Bgr(Color.White).MCvScalar, 1);
+                //CvInvoke.ArrowedLine(img, bottom_left_line.line.P1, bottom_left_line.line.P2, new Bgr(Color.White).MCvScalar, 1);
             }
             if (bottom_middle_lines.Count > 0)
             {
                 bottom_middle_line = getBigLine(bottom_middle_lines);
-                CvInvoke.ArrowedLine(img, bottom_middle_line.line.P1, bottom_middle_line.line.P2, new Bgr(Color.White).MCvScalar, 1);
+                //CvInvoke.ArrowedLine(img, bottom_middle_line.line.P1, bottom_middle_line.line.P2, new Bgr(Color.White).MCvScalar, 1);
             }
             if (bottom_right_lines.Count > 0)
             {
                 bottom_right_line = getBigLine(bottom_right_lines);
-                CvInvoke.ArrowedLine(img, bottom_right_line.line.P1, bottom_right_line.line.P2, new Bgr(Color.White).MCvScalar, 1);
+                //CvInvoke.ArrowedLine(img, bottom_right_line.line.P1, bottom_right_line.line.P2, new Bgr(Color.White).MCvScalar, 1);
             }
-            //WriteFeatureToCSV();
+            WriteFeatureToCSV();
             ///CvInvoke.Imshow("3x3 Frames", img);
             //CvInvoke.Imwrite("C:\\Users\\Antivirus\\Desktop\\of\\Frames.png",img);
             //CvInvoke.Imwrite("C:\\Users\\Antivirus\\Desktop\\of\\opticalflow" + (frameNumber - 1) + "-" + (frameNumber) + ".png", img);
@@ -463,7 +463,7 @@ namespace GaitRecognition
                         continue;
                     }
                     if (intensity < 2) { // if distance is smaller then ignore
-                        continue;
+                        //continue;
                     }
                     if (velxHere == 0 && velyHere == 0 && degrees == 0 && intensity == 0) {
                         continue;

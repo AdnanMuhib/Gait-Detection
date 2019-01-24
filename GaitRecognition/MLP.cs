@@ -122,7 +122,7 @@ namespace GaitRecognition
             using (TrainData td = new TrainData(trainData, Emgu.CV.ML.MlEnum.DataLayoutType.RowSample, trainClasses))
             {
                 nnet.SetLayerSizes(layerSizeMat);
-                nnet.SetActivationFunction(ANN_MLP.AnnMlpActivationFunction.SigmoidSym, 0.6, 1);
+                nnet.SetActivationFunction(ANN_MLP.AnnMlpActivationFunction.SigmoidSym, 0.7, 1);
                 nnet.TermCriteria = new MCvTermCriteria(430, 1.0e-8);
                 nnet.SetTrainMethod(ANN_MLP.AnnMlpTrainMethod.Backprop, 0.1, 0);
                 try

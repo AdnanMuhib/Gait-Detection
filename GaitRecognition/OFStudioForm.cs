@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace GaitRecognition
 {
@@ -37,9 +38,9 @@ namespace GaitRecognition
             // make a list of connected cameras to the computer
             List<String> cameras = new List<string>();
             videoPath = "";
-            frameSkip = 2;
+            frameSkip = 0;
             frameCounter = 0;
-            activityLabel = (int)ActivityClass.pointing;
+            activityLabel = (int)ActivityClass.waving;
             DsDevice[] _SystemCameras = DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);
 
             // if there is any camera
@@ -50,7 +51,7 @@ namespace GaitRecognition
                 }
             }
             else { // otherwise show error message
-                MessageBox.Show(" 0 Cameras Detected");
+                //MessageBox.Show(" 0 Cameras Detected");
             }
 
             // show the list of cameras in the drop down list
@@ -58,12 +59,12 @@ namespace GaitRecognition
            
            mlp = new MLP();
            mlp.LoadTrainedModel("ann_mlp_model.xml");
-            //mlp.LoadTrainData(@"C:\Users\Antivirus\Desktop\of\train.csv");
-            //mlp.Train();
-            //mlp.SaveModel("ann_mlp_model.xml");
-            //MessageBox.Show("Training Completed");
-            //mlp.LoadTestData(@"C:\Users\Antivirus\Desktop\of\test.csv");
-            //mlp.Predict();
+           //mlp.LoadTrainData(@"C:\Users\Antivirus\Desktop\of\train.csv");
+           //mlp.Train();
+           //mlp.SaveModel("ann_mlp_model.xml");
+           //MessageBox.Show("Training Completed");
+           //mlp.LoadTestData(@"C:\Users\Antivirus\Desktop\of\test.csv");
+           //mlp.Predict();
             //MessageBox.Show("Prediction Completed");
         }
 
@@ -314,11 +315,24 @@ namespace GaitRecognition
                         _capture.Dispose();
                         _capture = null;
                     }
-                    filename = Path.GetFileName(filePath);
+
+                    filename = Path.GetFileName(filePath).Split('.')[0];
                     _capture = new VideoCapture(filePath);
                     int TotalFrames = Convert.ToInt32(_capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameCount));
 
-                    for (int i = 0; i < TotalFrames; i++) {
+                    //ThreadStart ofThread = new ThreadStart(()=>OpticalFlowThread(filePath,TotalFrames));
+                    //Thread childThread = new Thread(ofThread);
+                    //childThread.Start();
+
+                    ThreadStart framesThread = new ThreadStart(() => SaveVideoFramesThread(filePath, TotalFrames));
+                    Thread childThread2 = new Thread(framesThread);
+                    childThread2.Start();
+
+                    //SaveVideoFramesThread(filePath, TotalFrames);
+                    OpticalFlowThread(filePath, TotalFrames);
+                    //childThread.Abort();
+                    //childThread2.Abort();
+                    /*for (int i = 0; i < TotalFrames; i++) {
                         try
                         {
                             if (_capture != null)
@@ -361,13 +375,114 @@ namespace GaitRecognition
                             // change the button icon to play
                             btnPlayPause.BackgroundImage = Properties.Resources.play36;
                         }
-                    }
+                    }*/
+
                     //Application.Idle += imageFrameCaptured;
                     //readWriteVideo(filePath, fileName, outputFolder);
                 }
                 Console.WriteLine("Features Extracted: " + filename);
             }
             MessageBox.Show("Videos Processed: " + files.Length.ToString(), "Message");
+        }
+        public void OpticalFlowThread(String filePath,int TotalFrames) {
+            //try
+            //{
+                Console.WriteLine("Child thread of Optical Flow starts");
+                String fileName = Path.GetFileName(filePath).Split('.')[0];
+                VideoCapture capture = new VideoCapture(filePath);
+                for (int i = 0; i < TotalFrames - 1; i++)
+                {
+                    try
+                    {
+                        if (capture != null)
+                        {
+                            if (i == 0)
+                            {
+                                prevFrame = capture.QueryFrame().ToImage<Gray, byte>().Resize(200, 200, Emgu.CV.CvEnum.Inter.Area);
+                            }
+                            else
+                            {
+                                for (int j = 0; j < frameSkip; j++)
+                                {
+                                    capture.Grab(); // skip the number of frames
+                                    i++;
+                                }
+                                _opticalflow = new OpticalFlow(filename, activityLabel);
+                                nextFrame = capture.QueryFrame().ToImage<Gray, byte>().Resize(200, 200, Emgu.CV.CvEnum.Inter.Area);
+                                _opticalflow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter);
+                                //opticalViewBox.Image = outputImg;
+                                //outputImg.Dispose();
+                                //_opticalflow.PyrLkOpticalFlow(prevFrame, nextFrame);
+                                prevFrame.Dispose();
+                                //pictureViewBox.Image = nextFrame;
+                                prevFrame = nextFrame.Clone();
+                                nextFrame.Dispose();
+                            }
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+
+                        capture.Pause();
+                        capture.Stop();
+                        capture.Dispose();
+                        capture = null;
+
+                        isPlaying = false;
+                        // change the button icon to play
+                        btnPlayPause.BackgroundImage = Properties.Resources.play36;
+                    }
+                }
+                Console.WriteLine("Child thread of Optical Flow Ends");
+            //}
+            //catch (ThreadAbortException e)
+            //{
+            //    Console.WriteLine("Thread Abort Exception");
+            //}
+            //finally
+            //{
+            //    Console.WriteLine("Couldn't catch the Thread Exception");
+            //}
+        }
+        public void SaveVideoFramesThread(String filePath,int TotalFrames)
+        {
+            Console.WriteLine("Child thread of Frames Starts");
+            try
+            {
+                String fileName = Path.GetFileName(filePath).Split('.')[0];
+                VideoCapture video = new VideoCapture(filePath);
+                String location = Path.GetDirectoryName(filePath);
+                String outputFolder = location + "\\frames";
+                bool folderExists = Directory.Exists(outputFolder);
+                if (!folderExists)
+                    Directory.CreateDirectory(outputFolder);
+                try
+                {
+                    for (int i = 0; i < TotalFrames - 1; i++)
+                    {
+                        Image<Gray, byte> frame = video.QueryFrame().ToImage<Gray, byte>();
+                        CvInvoke.Imwrite(outputFolder + "\\" + fileName + " " + i + ".png", frame);
+                        frame.Dispose();
+                    }
+                    video.Stop();
+                    video.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("End of Video Exception" + ex.Message);
+                }
+               
+            }
+            catch (ThreadAbortException e)
+            {
+                Console.WriteLine("Thread Abort Exception");
+            }
+            finally
+            {
+                Console.WriteLine("Child thread of Frames ends");
+            }
         }
     }
 }
