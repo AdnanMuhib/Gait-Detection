@@ -59,13 +59,13 @@ namespace GaitRecognition
            
            mlp = new MLP();
            mlp.LoadTrainedModel("ann_mlp_model.xml");
-           //mlp.LoadTrainData(@"C:\Users\Antivirus\Desktop\of\train.csv");
+           //mlp.LoadTrainData(@"G:\FYP_Dataset\Dataset 640x360\Optical Flow CombinedDataset\train.csv");
            //mlp.Train();
            //mlp.SaveModel("ann_mlp_model.xml");
            //MessageBox.Show("Training Completed");
-           //mlp.LoadTestData(@"C:\Users\Antivirus\Desktop\of\test.csv");
+           //mlp.LoadTestData(@"G:\FYP_Dataset\Dataset 640x360\Optical Flow CombinedDataset\test.csv");
            //mlp.Predict();
-            //MessageBox.Show("Prediction Completed");
+           //MessageBox.Show("Prediction Completed");
         }
 
         Mat _frame = new Mat();
@@ -96,7 +96,7 @@ namespace GaitRecognition
                             var sample = _opticalflow.GetFeatureMatrix();
                             int prediction = mlp.Inference(sample);
                             if (prediction == -1) {
-                                labelPrediction.Text = "Static";
+                                labelPrediction.Text = "";
                             }
                             else {
                                 labelPrediction.Text = Enum.GetName(typeof(ActivityClass), prediction);
@@ -329,7 +329,7 @@ namespace GaitRecognition
                     childThread2.Start();
 
                     //SaveVideoFramesThread(filePath, TotalFrames);
-                    OpticalFlowThread(filePath, TotalFrames);
+                   // OpticalFlowThread(filePath, TotalFrames);
                     //childThread.Abort();
                     //childThread2.Abort();
                     /*for (int i = 0; i < TotalFrames; i++) {
