@@ -63,9 +63,9 @@ namespace GaitRecognition
            //mlp.Train();
            //mlp.SaveModel("ann_mlp_model.xml");
            //MessageBox.Show("Training Completed");
-           //mlp.LoadTestData(@"G:\FYP_Dataset\Dataset 640x360\Optical Flow CombinedDataset\Outdoor_Test.csv");
+           //mlp.LoadTestData(@"G:\FYP_Dataset\Dataset 640x360\Optical Flow CombinedDataset\test.csv");
            //mlp.Predict();
-          // MessageBox.Show("Prediction Completed");
+           //MessageBox.Show("Prediction Completed");
         }
 
         Mat _frame = new Mat();
@@ -96,7 +96,7 @@ namespace GaitRecognition
                             var sample = _opticalflow.GetFeatureMatrix();
                             int prediction = mlp.Inference(sample);
                             if (prediction == -1) {
-                                labelPrediction.Text = "Static";
+                                labelPrediction.Text = "";
                             }
                             else {
                                 labelPrediction.Text = Enum.GetName(typeof(ActivityClass), prediction);

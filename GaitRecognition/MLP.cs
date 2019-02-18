@@ -119,15 +119,14 @@ namespace GaitRecognition
             varType.SetValue((byte)Emgu.CV.ML.MlEnum.VarType.Numerical); //the data is numerical
             varType[trainData.Cols, 0] = (byte)Emgu.CV.ML.MlEnum.VarType.Categorical; //the response is catagorical
 
-            using (Matrix<int> layerSize = new Matrix<int>(new int[] { InputLayers, 100,100,1 }))
+            using (Matrix<int> layerSize = new Matrix<int>(new int[] { InputLayers,100,100,1 }))
             using (Mat layerSizeMat = layerSize.Mat)
 
-            
-            using (TrainData td = new TrainData(trainData, Emgu.CV.ML.MlEnum.DataLayoutType.RowSample,trainClasses,null,null,null, varType))
+            using (TrainData td = new TrainData(trainData, Emgu.CV.ML.MlEnum.DataLayoutType.RowSample, trainClasses,null,null,null,varType))
             {
                 nnet.SetLayerSizes(layerSizeMat);
-                nnet.SetActivationFunction(ANN_MLP.AnnMlpActivationFunction.SigmoidSym, 0.5, 1);
-                nnet.TermCriteria = new MCvTermCriteria(1500, 1.0e-8);
+                nnet.SetActivationFunction(ANN_MLP.AnnMlpActivationFunction.SigmoidSym, 0.6, 1);
+                nnet.TermCriteria = new MCvTermCriteria(1000, 1.0e-8);
                 nnet.SetTrainMethod(ANN_MLP.AnnMlpTrainMethod.Backprop, 0.1, 0);
                 try
                 {
@@ -174,6 +173,14 @@ namespace GaitRecognition
 
         // Inference for Single Instance
         public int Inference(Matrix<float> sample) {
+            int mv = CountNullValues(sample);
+            if ( mv > 10)
+            {
+                //Console.WriteLine("Number of Missing Values: " + mv);
+                return -1;
+            }
+            
+
             Matrix<float> prediction = new Matrix<float>(1, 1);
             try
             {
@@ -187,6 +194,15 @@ namespace GaitRecognition
                 return -1;
             }
             return GetCloseValue(prediction.Data[0, 0]);
+        }
+
+        // Count Null Values
+        public int CountNullValues(Matrix<float> sample) {
+            int nullValues = 0;
+            for (int i = 0; i < sample.Cols; i++)
+                if (sample[0, i] == 0)
+                    nullValues = nullValues + 1;
+            return nullValues;
         }
         // PostProcess the prediction
         int GetCloseValue(double n)
