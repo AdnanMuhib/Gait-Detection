@@ -704,7 +704,7 @@ namespace GaitRecognition
             Mat m = new Mat();
             while (FrameNo < TotalFrame) {
                 capture.Read(m);
-                Image<Bgr, byte> frmImage = m.ToImage<Bgr, byte>().Resize(640,360,Inter.Cubic);
+                Image<Bgr, byte> frmImage = m.ToImage<Bgr, byte>().Resize(416,416,Inter.Cubic);
                 writer.Write(frmImage.Mat);
                 FrameNo++;
             }

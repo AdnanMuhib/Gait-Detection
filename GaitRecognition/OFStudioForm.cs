@@ -59,13 +59,13 @@ namespace GaitRecognition
            
            mlp = new MLP();
            mlp.LoadTrainedModel("ann_mlp_model.xml");
-           //mlp.LoadTrainData(@"C:\Users\Antivirus\Desktop\of\train.csv");
+           //mlp.LoadTrainData(@"G:\FYP_Dataset\Dataset 640x360\Optical Flow CombinedDataset\train.csv");
            //mlp.Train();
            //mlp.SaveModel("ann_mlp_model.xml");
            //MessageBox.Show("Training Completed");
-           //mlp.LoadTestData(@"C:\Users\Antivirus\Desktop\of\test.csv");
+           //mlp.LoadTestData(@"G:\FYP_Dataset\Dataset 640x360\Optical Flow CombinedDataset\Outdoor_Test.csv");
            //mlp.Predict();
-            //MessageBox.Show("Prediction Completed");
+          // MessageBox.Show("Prediction Completed");
         }
 
         Mat _frame = new Mat();
@@ -329,7 +329,7 @@ namespace GaitRecognition
                     childThread2.Start();
 
                     //SaveVideoFramesThread(filePath, TotalFrames);
-                    OpticalFlowThread(filePath, TotalFrames);
+                   // OpticalFlowThread(filePath, TotalFrames);
                     //childThread.Abort();
                     //childThread2.Abort();
                     /*for (int i = 0; i < TotalFrames; i++) {
@@ -462,9 +462,13 @@ namespace GaitRecognition
                 {
                     for (int i = 0; i < TotalFrames - 1; i++)
                     {
-                        Image<Gray, byte> frame = video.QueryFrame().ToImage<Gray, byte>();
-                        CvInvoke.Imwrite(outputFolder + "\\" + fileName + " " + i + ".png", frame);
+                        Image<Bgr, byte> frame = video.QueryFrame().ToImage<Bgr, byte>();
+                        CvInvoke.Imwrite(outputFolder + "\\" + fileName + " " + i + ".jpg", frame);
                         frame.Dispose();
+                        // skipping the frames
+                        for (int j = 0; j < frameSkip; j++) {
+                            i++;
+                        }
                     }
                     video.Stop();
                     video.Dispose();

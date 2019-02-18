@@ -115,15 +115,19 @@ namespace GaitRecognition
         // Begin the training of ANN_MLP
         public void Train() {
             int trainSampleCount = TrainSamples-1;
+            Matrix<Byte> varType = new Matrix<byte>(trainData.Cols + 1, 1);
+            varType.SetValue((byte)Emgu.CV.ML.MlEnum.VarType.Numerical); //the data is numerical
+            varType[trainData.Cols, 0] = (byte)Emgu.CV.ML.MlEnum.VarType.Categorical; //the response is catagorical
 
-            using (Matrix<int> layerSize = new Matrix<int>(new int[] { InputLayers, 100, 1 }))
+            using (Matrix<int> layerSize = new Matrix<int>(new int[] { InputLayers, 100,100,1 }))
             using (Mat layerSizeMat = layerSize.Mat)
 
-            using (TrainData td = new TrainData(trainData, Emgu.CV.ML.MlEnum.DataLayoutType.RowSample, trainClasses))
+            
+            using (TrainData td = new TrainData(trainData, Emgu.CV.ML.MlEnum.DataLayoutType.RowSample,trainClasses,null,null,null, varType))
             {
                 nnet.SetLayerSizes(layerSizeMat);
-                nnet.SetActivationFunction(ANN_MLP.AnnMlpActivationFunction.SigmoidSym, 0.7, 1);
-                nnet.TermCriteria = new MCvTermCriteria(430, 1.0e-8);
+                nnet.SetActivationFunction(ANN_MLP.AnnMlpActivationFunction.SigmoidSym, 0.5, 1);
+                nnet.TermCriteria = new MCvTermCriteria(1500, 1.0e-8);
                 nnet.SetTrainMethod(ANN_MLP.AnnMlpTrainMethod.Backprop, 0.1, 0);
                 try
                 {
@@ -134,20 +138,6 @@ namespace GaitRecognition
                 {
                     Console.WriteLine("Training Error:" + e.Message);
                 }
-
-#if !NETFX_CORE
-                String fileName = "ann_mlp_model.xml";
-                if (File.Exists(fileName)) // if model already exists delete model
-                    File.Delete(fileName);
-                nnet.Save(fileName); // save the model
-
-                // Loading the Trained Model from File
-                /*using (ANN_MLP mlp = new ANN_MLP())
-                {
-                    mlp.Load("ann_mlp_model.xml");
-                    //mlp.Predict();
-                }*/
-#endif
             }
         }
 
@@ -193,7 +183,7 @@ namespace GaitRecognition
             catch (Exception ex) {
                 Console.WriteLine(ex.Message);
             }
-            if (prediction.Data[0, 0] == 2.10772) {
+            if (prediction.Data[0, 0] < 0) {
                 return -1;
             }
             return GetCloseValue(prediction.Data[0, 0]);

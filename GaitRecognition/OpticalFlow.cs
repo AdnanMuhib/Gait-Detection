@@ -278,7 +278,7 @@ namespace GaitRecognition
                 bottom_right_line = getBigLine(bottom_right_lines);
                 //CvInvoke.ArrowedLine(img, bottom_right_line.line.P1, bottom_right_line.line.P2, new Bgr(Color.White).MCvScalar, 1);
             }
-            WriteFeatureToCSV();
+            //WriteFeatureToCSV();
             ///CvInvoke.Imshow("3x3 Frames", img);
             //CvInvoke.Imwrite("C:\\Users\\Antivirus\\Desktop\\of\\Frames.png",img);
             //CvInvoke.Imwrite("C:\\Users\\Antivirus\\Desktop\\of\\opticalflow" + (frameNumber - 1) + "-" + (frameNumber) + ".png", img);

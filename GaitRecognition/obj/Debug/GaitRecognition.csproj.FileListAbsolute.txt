@@ -37,3 +37,42 @@ C:\Users\Antivirus\Documents\Visual Studio 2015\Projects\GaitRecognition\GaitRec
 C:\Users\Antivirus\Documents\Visual Studio 2015\Projects\GaitRecognition\GaitRecognition\obj\Debug\GaitRecognition.GaitRecognition.resources
 C:\Users\Antivirus\Documents\Visual Studio 2015\Projects\GaitRecognition\GaitRecognition\obj\Debug\GaitRecognition.OFStudioForm.resources
 C:\Users\Antivirus\Documents\Visual Studio 2015\Projects\GaitRecognition\GaitRecognition\bin\Debug\DirectShowLib-2005.dll
+G:\GaitRecognition\GaitRecognition\bin\Debug\GaitRecognition.exe.config
+G:\GaitRecognition\GaitRecognition\obj\Debug\GaitRecognition.exe
+G:\GaitRecognition\GaitRecognition\obj\Debug\GaitRecognition.pdb
+G:\GaitRecognition\GaitRecognition\obj\Debug\GaitRecognition.csprojResolveAssemblyReference.cache
+G:\GaitRecognition\GaitRecognition\obj\Debug\GaitRecognition.GaitRecognition.resources
+G:\GaitRecognition\GaitRecognition\obj\Debug\GaitRecognition.OFStudioForm.resources
+G:\GaitRecognition\GaitRecognition\obj\Debug\GaitRecognition.Properties.Resources.resources
+G:\GaitRecognition\GaitRecognition\obj\Debug\GaitRecognition.csproj.GenerateResource.Cache
+G:\GaitRecognition\GaitRecognition\bin\Debug\concrt140.dll
+G:\GaitRecognition\GaitRecognition\bin\Debug\cvextern.dll
+G:\GaitRecognition\GaitRecognition\bin\Debug\msvcp140.dll
+G:\GaitRecognition\GaitRecognition\bin\Debug\opencv_ffmpeg343_64.dll
+G:\GaitRecognition\GaitRecognition\bin\Debug\GaitRecognition.exe
+G:\GaitRecognition\GaitRecognition\bin\Debug\GaitRecognition.pdb
+G:\GaitRecognition\GaitRecognition\bin\Debug\DirectShowLib-2005.dll
+G:\GaitRecognition\GaitRecognition\bin\Debug\Emgu.CV.DebuggerVisualizers.VS2015.dll
+G:\GaitRecognition\GaitRecognition\bin\Debug\Emgu.CV.UI.dll
+G:\GaitRecognition\GaitRecognition\bin\Debug\Emgu.CV.UI.GL.dll
+G:\GaitRecognition\GaitRecognition\bin\Debug\Emgu.CV.World.dll
+G:\GaitRecognition\GaitRecognition\bin\Debug\ZedGraph.dll
+G:\GaitRecognition\GaitRecognition\bin\Debug\Microsoft.VisualStudio.DebuggerVisualizers.dll
+G:\GaitRecognition\GaitRecognition\bin\Debug\Emgu.CV.UI.xml
+G:\GaitRecognition\GaitRecognition\bin\Debug\Emgu.CV.UI.GL.xml
+G:\GaitRecognition\GaitRecognition\bin\Debug\Emgu.CV.World.xml
+G:\GaitRecognition\GaitRecognition\bin\Debug\ZedGraph.xml
+G:\GaitRecognition\GaitRecognition\bin\Debug\Microsoft.VisualStudio.DebuggerVisualizers.xml
+G:\GaitRecognition\GaitRecognition\bin\Debug\de\ZedGraph.resources.dll
+G:\GaitRecognition\GaitRecognition\bin\Debug\es\ZedGraph.resources.dll
+G:\GaitRecognition\GaitRecognition\bin\Debug\fr\ZedGraph.resources.dll
+G:\GaitRecognition\GaitRecognition\bin\Debug\hu\ZedGraph.resources.dll
+G:\GaitRecognition\GaitRecognition\bin\Debug\it\ZedGraph.resources.dll
+G:\GaitRecognition\GaitRecognition\bin\Debug\ja\ZedGraph.resources.dll
+G:\GaitRecognition\GaitRecognition\bin\Debug\pt\ZedGraph.resources.dll
+G:\GaitRecognition\GaitRecognition\bin\Debug\ru\ZedGraph.resources.dll
+G:\GaitRecognition\GaitRecognition\bin\Debug\sk\ZedGraph.resources.dll
+G:\GaitRecognition\GaitRecognition\bin\Debug\sv\ZedGraph.resources.dll
+G:\GaitRecognition\GaitRecognition\bin\Debug\tr\ZedGraph.resources.dll
+G:\GaitRecognition\GaitRecognition\bin\Debug\zh-cn\ZedGraph.resources.dll
+G:\GaitRecognition\GaitRecognition\bin\Debug\zh-tw\ZedGraph.resources.dll
