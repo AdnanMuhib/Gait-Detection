@@ -119,7 +119,7 @@ namespace GaitRecognition
             varType.SetValue((byte)Emgu.CV.ML.MlEnum.VarType.Numerical); //the data is numerical
             varType[trainData.Cols, 0] = (byte)Emgu.CV.ML.MlEnum.VarType.Categorical; //the response is catagorical
 
-            using (Matrix<int> layerSize = new Matrix<int>(new int[] { InputLayers,100,100,1 }))
+            using (Matrix<int> layerSize = new Matrix<int>(new int[] { InputLayers,40,20,20,1 }))
             using (Mat layerSizeMat = layerSize.Mat)
 
             using (TrainData td = new TrainData(trainData, Emgu.CV.ML.MlEnum.DataLayoutType.RowSample, trainClasses,null,null,null,varType))
@@ -251,9 +251,15 @@ namespace GaitRecognition
 
         // Loading the Trained Model
         public void LoadTrainedModel(String ModelFileName) {
-            #if !NETFX_CORE
-                // Loading the Trained Model from File
+#if !NETFX_CORE
+            // Loading the Trained Model from File
+            try
+            {
                 nnet.Load(ModelFileName);
+            }
+            catch (Exception ex) {
+                Console.WriteLine(ex.ToString());
+            }
             #endif
         }
     }

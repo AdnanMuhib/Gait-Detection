@@ -1,0 +1,1 @@
+G:\GaitRecognition\GaitRecognition\bin\Release\GaitRecognition.exe.config

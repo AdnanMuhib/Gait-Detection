@@ -57,8 +57,8 @@ namespace GaitRecognition
             // show the list of cameras in the drop down list
             comboBoxCameraList.DataSource = cameras;
            
-           //mlp = new MLP();
-           //mlp.LoadTrainedModel("ann_mlp_model.xml");
+           mlp = new MLP();
+           mlp.LoadTrainedModel("model.xml");
            //mlp.LoadTrainData(@"G:\FYP\Dataset 640x360\Optical Flow CombinedDataset\train.csv");
            //mlp.Train();
            //mlp.SaveModel("ann_mlp_model.xml");
@@ -140,14 +140,28 @@ namespace GaitRecognition
                         if (frameCounter == 1)
                         {
                             _capture.Retrieve(_frame, 0);
-                            prevFrame = _frame.ToImage<Gray, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Cubic);
+                            prevFrame = _frame.ToImage<Gray, byte>().Resize(200, 200, Emgu.CV.CvEnum.Inter.Cubic);
                         }
-                        else {// if (frameCounter % frameSkip == 0) { // use only the frames after skipped frames
+                        else {
                             _capture.Retrieve(_frame, 0);
-                            nextFrame = _frame.ToImage<Gray, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Cubic);
+                            Image<Bgr, byte> bgrImage = _frame.ToImage<Bgr, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Cubic);
+                            nextFrame = _frame.ToImage<Gray, byte>().Resize(200, 200, Emgu.CV.CvEnum.Inter.Cubic);
                             _opticalflow = new OpticalFlow("", (int)ActivityClass.walking);
-                            opticalViewBox.Image = _opticalflow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter);
-                            pictureViewBox.Image = nextFrame;
+                            opticalViewBox.Image = _opticalflow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter).Resize(400,400,Emgu.CV.CvEnum.Inter.Cubic);
+                            
+                            // Predict the Optical Flow Features in Real Time
+                            var sample = _opticalflow.GetFeatureMatrix();
+                            int prediction = mlp.Inference(sample);
+                            if (prediction == -1)
+                            {
+                                labelPrediction.Text = "";
+                            }
+                            else
+                            {
+                                labelPrediction.Text = Enum.GetName(typeof(ActivityClass), prediction);
+                            }
+
+                            pictureViewBox.Image = bgrImage;
                             prevFrame.Dispose();
                             prevFrame = nextFrame.Clone();
                             nextFrame.Dispose();
