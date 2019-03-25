@@ -273,13 +273,15 @@ namespace GaitRecognition
                 bottom_middle_line = getBigLine(bottom_middle_lines);
                 CvInvoke.ArrowedLine(img, bottom_middle_line.line.P1, bottom_middle_line.line.P2, new Bgr(Color.White).MCvScalar, 1);
             }
+
             if (bottom_right_lines.Count > 0)
             {
                 bottom_right_line = getBigLine(bottom_right_lines);
                 CvInvoke.ArrowedLine(img, bottom_right_line.line.P1, bottom_right_line.line.P2, new Bgr(Color.White).MCvScalar, 1);
             }
             //WriteFeatureToCSV();
-            CvInvoke.Imshow("3x3 Frames", img);
+            //CvInvoke.NamedWindow("Motion Tracking");
+           // CvInvoke.Imshow("Motion Tracking", img.Resize(200,200,Inter.Cubic));
             //CvInvoke.Imwrite("C:\\Users\\Antivirus\\Desktop\\of\\Frames.png",img);
             //CvInvoke.Imwrite("C:\\Users\\Antivirus\\Desktop\\of\\opticalflow" + (frameNumber - 1) + "-" + (frameNumber) + ".png", img);
             return img;

@@ -57,13 +57,13 @@ namespace GaitRecognition
             // show the list of cameras in the drop down list
             comboBoxCameraList.DataSource = cameras;
            
-           mlp = new MLP();
-           mlp.LoadTrainedModel("ann_mlp_model.xml");
-           //mlp.LoadTrainData(@"G:\FYP_Dataset\Dataset 640x360\Optical Flow CombinedDataset\train.csv");
+           //mlp = new MLP();
+           //mlp.LoadTrainedModel("ann_mlp_model.xml");
+           //mlp.LoadTrainData(@"G:\FYP\Dataset 640x360\Optical Flow CombinedDataset\train.csv");
            //mlp.Train();
            //mlp.SaveModel("ann_mlp_model.xml");
            //MessageBox.Show("Training Completed");
-           //mlp.LoadTestData(@"G:\FYP_Dataset\Dataset 640x360\Optical Flow CombinedDataset\test.csv");
+           //mlp.LoadTestData(@"G:\FYP\Dataset 640x360\Optical Flow CombinedDataset\test.csv");
            //mlp.Predict();
            //MessageBox.Show("Prediction Completed");
         }
@@ -207,7 +207,9 @@ namespace GaitRecognition
                 }
                 else if (!isPlaying && _capture == null) // check if camera is not or it's first time for camera
                 {
-                    _capture = new VideoCapture();
+                    // Get the Selected Camera index
+                    int cam_number = comboBoxCameraList.SelectedIndex;
+                    _capture = new VideoCapture(camIndex:cam_number);
                     //_capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.PosFrames, frameSkip);
                     _capture.ImageGrabbed += imageFrameCaptured;
                     _capture.Start();
