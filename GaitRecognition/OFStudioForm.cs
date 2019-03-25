@@ -58,7 +58,7 @@ namespace GaitRecognition
             comboBoxCameraList.DataSource = cameras;
            
            mlp = new MLP();
-           mlp.LoadTrainedModel("model.xml");
+           mlp.LoadTrainedModel("ann_mlp_model.xml");
            //mlp.LoadTrainData(@"G:\FYP\Dataset 640x360\Optical Flow CombinedDataset\train.csv");
            //mlp.Train();
            //mlp.SaveModel("ann_mlp_model.xml");
@@ -84,9 +84,8 @@ namespace GaitRecognition
                         if (frameCounter == 1) {
                             prevFrame = _capture.QueryFrame().ToImage<Gray, byte>().Resize(200, 200, Emgu.CV.CvEnum.Inter.Area);
                         }
-                        else {// if (frameCounter % frameSkip == 0) { // use only the frames after skipped frames
-                              //BgrImage = _capture.QueryFrame().ToImage<Bgr, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Area);
-                              //pictureViewBox.Image = BgrImage;
+                        else {
+                            Image<Bgr, byte> bgrImage = _capture.QueryFrame().ToImage<Bgr, byte>().Resize(400, 400, Emgu.CV.CvEnum.Inter.Area);
                             for (int i = 0; i < frameSkip; i++) {
                                 _capture.Grab(); // skip the number of frames
                             }
@@ -95,17 +94,12 @@ namespace GaitRecognition
                             Image<Hsv, byte> outputImg = _opticalflow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter);
                             var sample = _opticalflow.GetFeatureMatrix();
                             int prediction = mlp.Inference(sample);
-                            if (prediction == -1) {
-                                labelPrediction.Text = "";
-                            }
-                            else {
-                                labelPrediction.Text = Enum.GetName(typeof(ActivityClass), prediction);
-                            }
-                            opticalViewBox.Image = outputImg;
+                            SetText(Enum.GetName(typeof(ActivityClass), prediction));
+                            opticalViewBox.Image = outputImg.Resize(300,300,Emgu.CV.CvEnum.Inter.Cubic);
                             outputImg.Dispose();
                             //_opticalflow.PyrLkOpticalFlow(prevFrame, nextFrame);
                             prevFrame.Dispose();
-                            pictureViewBox.Image = nextFrame;
+                            pictureViewBox.Image = bgrImage;
                             prevFrame = nextFrame.Clone();
                             nextFrame.Dispose();
                         }
@@ -148,19 +142,10 @@ namespace GaitRecognition
                             nextFrame = _frame.ToImage<Gray, byte>().Resize(200, 200, Emgu.CV.CvEnum.Inter.Cubic);
                             _opticalflow = new OpticalFlow("", (int)ActivityClass.walking);
                             opticalViewBox.Image = _opticalflow.CalculateOpticalFlow(prevFrame, nextFrame, frameCounter).Resize(400,400,Emgu.CV.CvEnum.Inter.Cubic);
-                            
                             // Predict the Optical Flow Features in Real Time
                             var sample = _opticalflow.GetFeatureMatrix();
                             int prediction = mlp.Inference(sample);
-                            if (prediction == -1)
-                            {
-                                labelPrediction.Text = "";
-                            }
-                            else
-                            {
-                                labelPrediction.Text = Enum.GetName(typeof(ActivityClass), prediction);
-                            }
-
+                            SetText(Enum.GetName(typeof(ActivityClass), prediction));
                             pictureViewBox.Image = bgrImage;
                             prevFrame.Dispose();
                             prevFrame = nextFrame.Clone();
@@ -186,7 +171,24 @@ namespace GaitRecognition
 
 
         }
-
+        delegate void SetTextCallback(string text);
+        // Update the Prediction Label after prediction on Each Frame
+        private void SetText(string text)
+        {
+            // InvokeRequired required compares the thread ID of the
+            // calling thread to the thread ID of the creating thread.
+            // If these threads are different, it returns true.
+            if (this.labelPrediction.InvokeRequired)
+            {
+                SetTextCallback d = new SetTextCallback(SetText);
+                this.Invoke(d, new object[] { text });
+            }
+            else
+            {
+                this.labelPrediction.Text = text;
+            }
+        }
+       
         private void radioButtonCamera_CheckedChanged(object sender, EventArgs e)
         {
             if (radioButtonCamera.Checked) {
