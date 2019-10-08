@@ -7,3 +7,5 @@ Human Gait Detection
 #### HoughLine Transformation
 #### Post Processing Houghlines
 #### Feature Points Extraction
+#### Model Training using EMGU CV Machine Learning
+#### Testing GUI with real time camera
